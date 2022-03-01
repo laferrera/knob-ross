@@ -67,13 +67,15 @@ Bounce buttonB = Bounce(23, 5);
 
 struct Knob
 {
-  uint16_t prev_val;
+  int prev_val;
   uint8_t cc;
-  uint8_t phase;
-  uint8_t minValue;
+  int phase;
+  int minValue;
   uint8_t maxValue;
-  uint8_t offset;
+  int offset;
   uint8_t lfoType;
+  uint8_t knobDestination;
+  uint8_t lfoDestination;
 };
 
 struct Knob knob1;
@@ -98,16 +100,18 @@ Encoder *encoders[17] = {&enc1, &enc2, &enc3, &enc4, &enc5, &enc6, &enc7, &enc8,
 // Knob *knobs[16] = {};
 Knob *knobs[16] = {&knob1, &knob2, &knob3, &knob4, &knob5, &knob6, &knob7, &knob8, &knob9, &knob10, &knob11, &knob12, &knob13, &knob14, &knob15, &knob16};
 
-// Prevent jitter when reading the potentiometers.
-// Higher value is less chance of jitter but also less precision.
-const uint8_t nbrhd = 5;
 int ledState = HIGH;
 int buttonAState = HIGH;
 int buttonBState = HIGH;
 Metro ledMetro = Metro(250);
-uint32_t last_time_display = millis();
+bool screenDirty = false;
+uint32_t lastTimeDisplayMillis = millis();
+uint32_t screenStepTime = 6; // ~15fps
+uint32_t lfoStepTime = 6; // ~15fps
+uint32_t metroStepTime = 12; // ~7fps
 
-void drawText(String text, uint8_t line){
+void drawText(String text, uint8_t line)
+{
   display.clearDisplay();
   display.setTextSize(1);              // Normal 1:1 pixel scale
   display.setTextColor(SSD1306_WHITE); // Draw white text
@@ -131,9 +135,9 @@ void testdrawbitmap(void)
 }
 
 void redrawDisplay(void){
-  if (millis() - last_time_display > 10){
+  if (screenDirty && (millis() - lastTimeDisplayMillis > 10)) {
     display.display();
-    last_time_display = millis();
+    lastTimeDisplayMillis = millis();
   }
 }
 
@@ -156,7 +160,7 @@ void setup()
   // Show initial display buffer contents on the screen --
   // the library initializes this with an Adafruit splash screen.
   display.setFont(&font04B_038pt7b);
-
+  display.setRotation(2);
   display.clearDisplay();
   display.setTextSize(1);              // Normal 1:1 pixel scale
   display.setTextColor(SSD1306_WHITE); // Draw white text
@@ -198,28 +202,28 @@ void setup()
 }
 
 
-
-void loop()
-{
-   buttonA.update();
-   buttonB.update();
+void loop(){
   
-   for(int i = 0; i < 16; i++){
-     Encoder encoder = *encoders[i];
-     Knob knob = *knobs[i];
-     long newKnobValue = encoder.read();
-     if (newKnobValue != knob.prev_val){
-       knob.prev_val = newKnobValue;
-       usbMIDI.sendControlChange(knob.cc, newKnobValue >> (POT_BIT_RES - 7), MIDI_CHANNEL);
-       ledState = HIGH;
-       digitalWrite(LED, ledState);
-       ledMetro.interval(250);
-       String knobtext = "knob " + String(i + 1) + ": " + String(newKnobValue);
-       drawText(knobtext, 1);
-       Serial.println(knobtext);
-       // drawText(knobtext, 9 * (i + 2));
-       *knobs[i] = knob;
-     }
+  buttonA.update();
+  buttonB.update();
+
+  for (int i = 0; i < 16; i++)
+  {
+    Encoder encoder = *encoders[i];
+
+    long newKnobValue = encoder.read();
+    if (newKnobValue != knobs[i]->prev_val)
+    {
+      knobs[i]->prev_val = newKnobValue;
+      usbMIDI.sendControlChange(knobs[i]->cc, newKnobValue >> (POT_BIT_RES - 7), MIDI_CHANNEL);
+      ledState = HIGH;
+      digitalWrite(LED, ledState);
+      ledMetro.interval(250);
+      String knobtext = "knob " + String(i + 1) + ": " + String(newKnobValue);
+      drawText(knobtext, 1);
+      Serial.println(knobtext);
+      // drawText(knobtext, 9 * (i + 2));
+    }
    }
   
    if (ledMetro.check() == 1){
