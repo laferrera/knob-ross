@@ -1,11 +1,13 @@
-#include <SPI.h>
-#include <Wire.h>
+#include<SPI.h>
+#include<Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-#include "font04B_03.h"
-#include <Encoder.h>
 #include <Bounce.h>
+#include <Encoder.h>
 #include <Metro.h>
+#include <SPI.h>
+#include <Wire.h>
+#include "font04B_03.h"
 
 #define LED 13
 #define SCREEN_WIDTH 128
@@ -13,7 +15,7 @@
 
 #define OLED_RESET -1       // Reset pin # (or -1 if sharing Arduino reset pin)
 #define SCREEN_ADDRESS 0x3C /// use Examples/Wire/Scanner to find the i2c address
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+                     Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 #define LOGO_HEIGHT 16
 #define LOGO_WIDTH 16
@@ -65,8 +67,7 @@ Bounce buttonB = Bounce(23, 5);
 // potentiometer read parameters
 #define POT_BIT_RES 10 // 10 works, 7-16 is valid
 
-struct Knob
-{
+struct Knob {
   int prev_val;
   uint8_t cc;
   int phase;
@@ -105,25 +106,24 @@ int buttonAState = HIGH;
 int buttonBState = HIGH;
 Metro ledMetro = Metro(250);
 bool screenDirty = false;
+bool knobsDirty = false;
 uint32_t lastTimeDisplayMillis = millis();
 uint32_t screenStepTime = 6; // ~15fps
-uint32_t lfoStepTime = 6; // ~15fps
+uint32_t lfoStepTime = 6;    // ~15fps
 uint32_t metroStepTime = 12; // ~7fps
 
-void drawText(String text, uint8_t line)
-{
+void drawText(String text, uint8_t line) {
   display.clearDisplay();
   display.setTextSize(1);              // Normal 1:1 pixel scale
   display.setTextColor(SSD1306_WHITE); // Draw white text
-  display.setCursor(0, 9 * line);      // Start at top-left corner
-  display.println(text);
+  display.setCursor(0, 10 * line);      // Start at top-left corner
+  display.println(text);    
   display.display();
   //   display.setTextColor(SSD1306_BLACK, SSD1306_WHITE); // Draw 'inverse' text
   //   display.setTextSize(2);             // Draw 2X-scale text
 }
 
-void testdrawbitmap(void)
-{
+void testdrawbitmap(void) {
   display.clearDisplay();
 
   display.drawBitmap(
@@ -134,24 +134,21 @@ void testdrawbitmap(void)
   delay(1000);
 }
 
-void redrawDisplay(void){
+void redrawDisplay(void) {
   if (screenDirty && (millis() - lastTimeDisplayMillis > 10)) {
     display.display();
     lastTimeDisplayMillis = millis();
   }
 }
 
-void setup()
-{
+void setup() {
   Serial.begin(38400);
   // MIDI Controllers should discard incoming MIDI messages.
-  while (usbMIDI.read())
-  {
+  while (usbMIDI.read()) {
   }
 
   // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
-  if (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS))
-  {
+  if (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
     Serial.println(F("SSD1306 allocation failed"));
     for (;;)
       ; // Don't proceed, loop forever
@@ -160,7 +157,7 @@ void setup()
   // Show initial display buffer contents on the screen --
   // the library initializes this with an Adafruit splash screen.
   display.setFont(&font04B_038pt7b);
-  display.setRotation(2);
+ display.setRotation(2);
   display.clearDisplay();
   display.setTextSize(1);              // Normal 1:1 pixel scale
   display.setTextColor(SSD1306_WHITE); // Draw white text
@@ -177,18 +174,19 @@ void setup()
   display.display();
 
   delay(2000); // Pause for 2 seconds
-               //  display.clearDisplay();
-               //  display.display();
+  //  display.clearDisplay();
+  //  display.display();
 
   // Clear the buffer
   display.clearDisplay();
 
-   pinMode(LED, OUTPUT);
-   digitalWrite(LED, ledState);
-   pinMode(buttonApin, INPUT_PULLUP);
-   pinMode(buttonBpin, INPUT_PULLUP);
-  for (int i = 0; i < 16; i++)
-  {
+  pinMode(LED, OUTPUT);
+  digitalWrite(LED, ledState);
+  pinMode(buttonApin, INPUT_PULLUP);
+  pinMode(buttonBpin, INPUT_PULLUP);
+
+  // initiaize knobs, should probably do this for banks.
+  for (int i = 0; i < 16; i++) {
     Knob knob;
     knob.prev_val = -999;
     knob.cc = 102 + i;
@@ -201,19 +199,26 @@ void setup()
   }
 }
 
+void loop() {
+  // always check buttons and encoders
+  if (buttonA.update()) {
+    if (buttonA.fallingEdge()) {
+      // button A pressed
+    }
+  }
 
-void loop(){
-  
-  buttonA.update();
-  buttonB.update();
+  if (buttonB.update()) {
+    if (buttonB.fallingEdge()) {
+      // button pressed
+    }
+  }
 
-  for (int i = 0; i < 16; i++)
-  {
-    Encoder encoder = *encoders[i];
-
-    long newKnobValue = encoder.read();
-    if (newKnobValue != knobs[i]->prev_val)
-    {
+  for (int i = 0; i < 16; i++) {
+    // Encoder encoder = *encoders[i];
+    // long newKnobValue = encoder.read();
+    long newKnobValue = encoders[i]->read();
+    if (newKnobValue != knobs[i]->prev_val) {
+      knobsDirty = true;
       knobs[i]->prev_val = newKnobValue;
       usbMIDI.sendControlChange(knobs[i]->cc, newKnobValue >> (POT_BIT_RES - 7), MIDI_CHANNEL);
       ledState = HIGH;
@@ -224,25 +229,17 @@ void loop(){
       Serial.println(knobtext);
       // drawText(knobtext, 9 * (i + 2));
     }
-   }
-  
-   if (ledMetro.check() == 1){
-     ledState = LOW;
-     digitalWrite(LED, ledState);
-   }
-   if (digitalRead(buttonApin) == LOW){
-     buttonAState = LOW;
-   }
-   if (digitalRead(buttonBpin) == LOW){
-     buttonBState = LOW;
-   }
+  }
 
-  if (Serial.available())
-  {
+  if (ledMetro.check() == 1) {
+    ledState = LOW;
+    digitalWrite(LED, ledState);
+  }
+
+  if (Serial.available()) {
     Serial.read();
     Serial.println("Reset knobs to zero");
-    for (int i = 0; i < 16; i++)
-    {
+    for (int i = 0; i < 16; i++) {
       Encoder encoder = *encoders[i];
       encoder.write(0);
     }
