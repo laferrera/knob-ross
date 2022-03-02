@@ -10,6 +10,8 @@
 #include "font04B_03.h"
 
 #define LED 13
+// #define SCREEN_SAVER_TIMEOUT_MS 100000
+#define SCREEN_SAVER_TIMEOUT_MS 10000
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
 
@@ -106,11 +108,18 @@ int buttonAState = HIGH;
 int buttonBState = HIGH;
 Metro ledMetro = Metro(250);
 bool screenDirty = false;
+bool screenSaver = false;
 bool knobsDirty = false;
-uint32_t lastTimeDisplayMillis = millis();
+// unsigned long lastTimeDisplayMillis = millis();
+// unsigned long lastKnobTouchMillis = millis();
+elapsedMillis ellapsedDisplayMillis;
+elapsedMillis ellapsedKnobTouchMillis;
+elapsedMillis ellapsedMetroMillis;
+elapsedMillis ellapsedLfoMillis;
+
 uint32_t screenStepTime = 6; // ~15fps
-uint32_t lfoStepTime = 6;    // ~15fps
-uint32_t metroStepTime = 12; // ~7fps
+uint32_t lfoStepTime = 7;    //
+uint32_t metroStepTime = 11; //
 
 void drawText(String text, uint8_t line) {
   display.clearDisplay();
@@ -135,10 +144,7 @@ void testdrawbitmap(void) {
 }
 
 void redrawDisplay(void) {
-  if (screenDirty && (millis() - lastTimeDisplayMillis > 10)) {
-    display.display();
-    lastTimeDisplayMillis = millis();
-  }
+
 }
 
 void setup() {
@@ -219,6 +225,8 @@ void loop() {
     long newKnobValue = encoders[i]->read();
     if (newKnobValue != knobs[i]->prev_val) {
       knobsDirty = true;
+      ellapsedKnobTouchMillis = 0;
+      screenSaver = false;
       knobs[i]->prev_val = newKnobValue;
       usbMIDI.sendControlChange(knobs[i]->cc, newKnobValue >> (POT_BIT_RES - 7), MIDI_CHANNEL);
       ledState = HIGH;
@@ -235,6 +243,46 @@ void loop() {
     ledState = LOW;
     digitalWrite(LED, ledState);
   }
+
+  // elapsedMillis displayMillis;
+  // elapsedMillis knobTouchMillis;
+  // elapsedMillis metroMillis;
+  // elapsedMillis lfoMillis;
+
+  // screen cycle
+  if (screenDirty && !screenSaver && (ellapsedDisplayMillis > screenStepTime)) {
+    // update display
+    // Serial.println("updating display");
+    ellapsedDisplayMillis = ellapsedDisplayMillis - screenStepTime;
+  }
+
+  // lfo cycle
+  if (ellapsedLfoMillis > lfoStepTime) {
+    // update display
+    // Serial.println("computing lfos");
+    ellapsedLfoMillis = ellapsedLfoMillis - lfoStepTime;
+  }
+
+  // metro cycle
+  if (ellapsedMetroMillis > metroStepTime) {
+    // update metro
+    // Serial.println("metro stuff");
+    ellapsedMetroMillis = ellapsedMetroMillis - metroStepTime;
+  }
+
+  // check for incoming midi messages
+
+  // screensaver cycle
+  if (!screenSaver && (ellapsedKnobTouchMillis > SCREEN_SAVER_TIMEOUT_MS)) {
+    // update display
+    screenSaver = true;
+    display.fillScreen(SSD1306_BLACK);
+    display.display();
+    Serial.println("screensaver on ");
+  }
+
+
+
 
   if (Serial.available()) {
     Serial.read();
