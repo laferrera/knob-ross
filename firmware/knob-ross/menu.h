@@ -39,4 +39,15 @@ void setupMenu() {
   menu.setMenuPageCurrent(menuPageMain);
 }
 
+void printData() {
+  // If enablePrint flag is set to true (checkbox on screen is checked)...
+  if (enableSerialPrint) {
+    // ...print the number to Serial
+    Serial.print("Number is: ");
+    Serial.println(selectNumber);
+  } else {
+    Serial.println("Printing is disabled, sorry:(");
+  }
+}
+
 #endif

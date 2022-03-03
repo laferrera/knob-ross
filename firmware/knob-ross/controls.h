@@ -61,4 +61,30 @@ struct Knob knob16;
 
 Encoder *encoders[17] = {&enc1, &enc2, &enc3, &enc4, &enc5, &enc6, &enc7, &enc8, &enc9, &enc10, &enc11, &enc12, &enc13, &enc14, &enc15, &enc16};
 Knob *knobs[16] = {&knob1, &knob2, &knob3, &knob4, &knob5, &knob6, &knob7, &knob8, &knob9, &knob10, &knob11, &knob12, &knob13, &knob14, &knob15, &knob16};
+
+void initializeKnobs(void){
+  // initiaize knobs, should probably do this for banks.
+  for (int i = 0; i < 16; i++) {
+    Knob knob;
+    knob.prev_val = -999;
+    knob.cc = 102 + i;
+    knob.phase = 0;
+    knob.lfoType = 0;
+    knob.minValue = 0;
+    knob.maxValue = 127;
+    knob.offset = 0;
+    *knobs[i] = knob;
+  }
+}
+
+void initializeButtons(void){
+  buttonCancel.attach(buttonCancelPin, INPUT_PULLUP);
+  buttonOkay.attach(buttonOkayPin, INPUT_PULLUP);
+  buttonCancel.interval(5);
+  buttonOkay.interval(5);
+  buttonCancel.setPressedState(LOW);
+  buttonOkay.setPressedState(LOW);
+}
+
 #endif
+

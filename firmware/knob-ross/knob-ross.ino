@@ -1,7 +1,7 @@
 #include <Metro.h>
 #include "display.h"
 #include "controls.h"
-// #include "menu.h"
+#include "menu.h"
 
 
 #define LED 13
@@ -34,53 +34,18 @@ void setup() {
       ; // Don't proceed, loop forever
   }
 
-  // Show initial display buffer contents on the screen --
-  // the library initializes this with an Adafruit splash screen.
-  display.setFont(&font04B_034pt7b);
-  display.setRotation(2);
-  display.clearDisplay();
-  display.setTextSize(1);              // Normal 1:1 pixel scale
-  display.setTextColor(SSD1306_WHITE); // Draw white text
-  display.setCursor(0, 9);
-  display.println("knob ross");
-  display.setCursor(0, 18);
-  display.println("     knob ross");
-  display.setCursor(0, 27);
-  display.println("knob ross");
-  display.setCursor(0, 36);
-  display.println("     knob ross");
-  display.println("knob ross");
-  display.setCursor(0, 45);
-  display.display();
-
-  delay(2000); // Pause for 2 seconds
-  //  display.clearDisplay();
-  //  display.display();
-
-  // Clear the buffer
-  display.clearDisplay();
+  startupScreen();
+  initializeKnobs();
+  initializeButtons();
 
   pinMode(LED, OUTPUT);
   digitalWrite(LED, ledState);
-  buttonCancel.attach( buttonCancelPin,  INPUT_PULLUP ); // USE INTERNAL PULL-UP
-  buttonOkay.attach( buttonOkayPin, INPUT_PULLUP );
-  buttonCancel.interval(5); 
-  buttonOkay.interval(5);   
-  buttonCancel.setPressedState(LOW); 
-  buttonOkay.setPressedState(LOW); 
 
-  // initiaize knobs, should probably do this for banks.
-  for (int i = 0; i < 16; i++) {
-    Knob knob;
-    knob.prev_val = -999;
-    knob.cc = 102 + i;
-    knob.phase = 0;
-    knob.lfoType = 0;
-    knob.minValue = 0;
-    knob.maxValue = 127;
-    knob.offset = 0;
-    *knobs[i] = knob;
-  }
+
+  menu.init(); 
+  setupMenu();
+  menu.drawMenu();
+  display.display();
 }
 
 void loop() {
@@ -110,7 +75,7 @@ void loop() {
       digitalWrite(LED, ledState);
       ledMetro.interval(250);
       String knobtext = "knob " + String(i + 1) + ": " + String(newKnobValue);
-      drawText(knobtext, 1);
+      // drawText(knobtext, 1);
       Serial.println(knobtext);
       // drawText(knobtext, 9 * (i + 2));
     }

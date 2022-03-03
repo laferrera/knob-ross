@@ -63,4 +63,25 @@ void testdrawbitmap(void) {
   delay(1000);
 }
 
+void startupScreen(){
+  display.setFont(&font04B_034pt7b);
+  display.setRotation(2);
+  display.clearDisplay();
+  display.setTextSize(1);              // Normal 1:1 pixel scale
+  display.setTextColor(SSD1306_WHITE); // Draw white text
+  display.setCursor(0, 9);
+  display.println("knob ross");
+  display.setCursor(0, 18);
+  display.println("     knob ross");
+  display.setCursor(0, 27);
+  display.println("knob ross");
+  display.setCursor(0, 36);
+  display.println("     knob ross");
+  display.println("knob ross");
+  display.setCursor(0, 45);
+  display.display();
+  delay(2000); // Pause for 2 seconds
+  display.clearDisplay();
+}
+
 #endif
