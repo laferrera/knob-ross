@@ -2,7 +2,7 @@
 #ifndef CONTROLS_H
 #define CONTROLS_H
 
-#include <Bounce.h>
+#include <Bounce2.h>
 #include <Encoder.h>
 
 bool knobsDirty = false;
@@ -23,14 +23,13 @@ Encoder enc13(35, 36);
 Encoder enc14(37, 38);
 Encoder enc15(39, 40);
 Encoder enc16(41, 14);
-Encoder controlKnob(15, 16);
+// Encoder controlKnob(15, 16);
 
-int buttonApin = 22;
-int buttonBpin = 23;
-Bounce buttonA = Bounce(22, 5);
-Bounce buttonB = Bounce(23, 5);
-int buttonAState = HIGH;
-int buttonBState = HIGH;
+int buttonCancelPin = 6; 
+int buttonOkayPin = 12;
+Button buttonCancel = Button();
+Button buttonOkay = Button();
+
 struct Knob {
   int prev_val;
   uint8_t cc;

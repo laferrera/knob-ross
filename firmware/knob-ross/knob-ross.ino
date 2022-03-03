@@ -1,7 +1,7 @@
 #include <Metro.h>
 #include "display.h"
 #include "controls.h"
-#include "menu.h"
+// #include "menu.h"
 
 
 #define LED 13
@@ -36,7 +36,7 @@ void setup() {
 
   // Show initial display buffer contents on the screen --
   // the library initializes this with an Adafruit splash screen.
-  display.setFont(&font04B_038pt7b);
+  display.setFont(&font04B_034pt7b);
   display.setRotation(2);
   display.clearDisplay();
   display.setTextSize(1);              // Normal 1:1 pixel scale
@@ -62,8 +62,12 @@ void setup() {
 
   pinMode(LED, OUTPUT);
   digitalWrite(LED, ledState);
-  pinMode(buttonApin, INPUT_PULLUP);
-  pinMode(buttonBpin, INPUT_PULLUP);
+  buttonCancel.attach( buttonCancelPin,  INPUT_PULLUP ); // USE INTERNAL PULL-UP
+  buttonOkay.attach( buttonOkayPin, INPUT_PULLUP );
+  buttonCancel.interval(5); 
+  buttonOkay.interval(5);   
+  buttonCancel.setPressedState(LOW); 
+  buttonOkay.setPressedState(LOW); 
 
   // initiaize knobs, should probably do this for banks.
   for (int i = 0; i < 16; i++) {
@@ -80,18 +84,17 @@ void setup() {
 }
 
 void loop() {
-  // always check buttons and encoders
-  if (buttonA.update()) {
-    if (buttonA.fallingEdge()) {
-      // button A pressed
-    }
-  }
+// always check buttons and encoders  
 
-  if (buttonB.update()) {
-    if (buttonB.fallingEdge()) {
-      // button pressed
-    }
+  buttonCancel.update();
+  buttonOkay.update();
+  if (buttonCancel.fallingEdge()) {
+    // button A pressed
   }
+  if (buttonOkay.fallingEdge()) {
+    // button pressed
+  }
+  
 
   for (int i = 0; i < 16; i++) {
     // Encoder encoder = *encoders[i];
@@ -141,6 +144,10 @@ void loop() {
 
   // check for incoming midi messages
 
+  
+  // Menu draw
+  // menu.drawMenu();
+
   // screensaver cycle
   if (!screenSaver && (ellapsedKnobTouchMillis > SCREEN_SAVER_TIMEOUT_MS)) {
     // update display
@@ -150,15 +157,4 @@ void loop() {
     Serial.println("screensaver on ");
   }
 
-
-
-
-  if (Serial.available()) {
-    Serial.read();
-    Serial.println("Reset knobs to zero");
-    for (int i = 0; i < 16; i++) {
-      Encoder encoder = *encoders[i];
-      encoder.write(0);
-    }
-  }
 }

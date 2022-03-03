@@ -7,6 +7,7 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include "font04B_03.h"
+#include "font04B_03_4pt.h"
 
 // #define SCREEN_SAVER_TIMEOUT_MS 100000
 #define SCREEN_SAVER_TIMEOUT_MS 10000
