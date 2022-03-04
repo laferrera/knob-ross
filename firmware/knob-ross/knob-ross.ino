@@ -42,7 +42,7 @@ void setup() {
 
   menu.init(); 
   setupMainMenu();
-  // setupKnobMenu(knobs);
+  setupKnobMenu(knobs);
 }
 
 void loop() {

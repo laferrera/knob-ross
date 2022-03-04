@@ -42,6 +42,7 @@ boolean enableSerialPrint = false;
 void printData(); // Forward declaration
 // GEMItem menuItemInt("Number:", bad_ui_number);
 GEMSelect menuSelect(sizeof(twoFiveSixArr) / sizeof(SelectOptionInt), twoFiveSixArr);
+GEMSelect twoFiveEight(sizeof(twoFiveSixArr) / sizeof(SelectOptionInt), twoFiveSixArr);
 GEMItem menuItemSelect("Number:", selectNumber, menuSelect);
 GEMItem menuItemBool("Print?:", enableSerialPrint);
 GEMItem menuItemButton("Print", printData);
@@ -64,12 +65,15 @@ void setupMainMenu() {
 void setupKnobMenu(Knob *knobs[]){
   // Serial.print("Knob1 Value: " + String(knobs[0]->value));
   // for (int i = 0; i < sizeof(*knobs); i++) {
-  // for (int i = 0; i < 8; i++) {
-  //   String knobPageName = "Knob " + String(i);
-  //   GEMPage knobPage = new GEMPage(knobPageName);
-  //   GEMItem knobPageLink = new GEMItem(*knobPageName, knobPage);
-  //   // knobsMenuPage.addMenuItem(GEMItem("Knob" + String(i) + " Value:", knobs[i]->value));
-  // }
+  for (int i = 0; i < 8; i++) {
+    String knobPageName = "Knob " + String(i);
+    char *cString = const_cast<char *>(knobPageName.c_str());
+    Serial.print(cString);
+    GEMPage knobPage(cString);
+    GEMItem knobPageLink(cString, knobPage);
+    // knobsMenuPage.addMenuItem(knobPageLink);
+    // twoFiveEight, , knobs[i]->value)
+  }
 
   // min
   // max
