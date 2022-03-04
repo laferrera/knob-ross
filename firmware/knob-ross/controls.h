@@ -6,7 +6,8 @@
 #include <Encoder.h>
 
 bool knobsDirty = false;
-Encoder enc1(0, 1);
+// Encoder enc1(0, 1);
+Encoder enc1(15, 16);
 Encoder enc2(2, 3);
 Encoder enc3(4, 5);
 Encoder enc4(6, 7);
@@ -24,14 +25,15 @@ Encoder enc14(37, 38);
 Encoder enc15(39, 40);
 Encoder enc16(41, 14);
 // Encoder controlKnob(15, 16);
-
+Encoder controlKnob(0, 1);
+int controlKnobValue = 0;
 int buttonCancelPin = 6; 
 int buttonOkayPin = 12;
 Button buttonCancel = Button();
 Button buttonOkay = Button();
 
 struct Knob {
-  int prev_val;
+  int value;
   uint8_t cc;
   int phase;
   int minValue;
@@ -66,7 +68,7 @@ void initializeKnobs(void){
   // initiaize knobs, should probably do this for banks.
   for (int i = 0; i < 16; i++) {
     Knob knob;
-    knob.prev_val = -999;
+    knob.value = -999;
     knob.cc = 102 + i;
     knob.phase = 0;
     knob.lfoType = 0;
@@ -77,6 +79,7 @@ void initializeKnobs(void){
   }
 }
 
+
 void initializeButtons(void){
   buttonCancel.attach(buttonCancelPin, INPUT_PULLUP);
   buttonOkay.attach(buttonOkayPin, INPUT_PULLUP);
@@ -85,6 +88,7 @@ void initializeButtons(void){
   buttonCancel.setPressedState(LOW);
   buttonOkay.setPressedState(LOW);
 }
+
 
 #endif
 

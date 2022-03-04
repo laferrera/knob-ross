@@ -47,7 +47,7 @@ void drawText(String text, uint8_t line) {
   display.setTextColor(SSD1306_WHITE); // Draw white text
   display.setCursor(0, 10 * line);     // Start at top-left corner
   display.println(text);
-  display.display();
+  screenDirty = true;
   //   display.setTextColor(SSD1306_BLACK, SSD1306_WHITE); // Draw 'inverse' text
   //   display.setTextSize(2);             // Draw 2X-scale text
 }
@@ -59,7 +59,7 @@ void testdrawbitmap(void) {
       (display.width() - LOGO_WIDTH) / 2,
       (display.height() - LOGO_HEIGHT) / 2,
       logo_bmp, LOGO_WIDTH, LOGO_HEIGHT, 1);
-  display.display();
+
   delay(1000);
 }
 

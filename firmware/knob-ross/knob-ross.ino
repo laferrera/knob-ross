@@ -3,7 +3,6 @@
 #include "controls.h"
 #include "menu.h"
 
-
 #define LED 13
 int ledState = HIGH;
 Metro ledMetro = Metro(250);
@@ -11,7 +10,6 @@ Metro ledMetro = Metro(250);
 #define MIDI_CHANNEL 1
 
 // unsigned long lastTimeDisplayMillis = millis();
-// unsigned long lastKnobTouchMillis = millis();
 elapsedMillis ellapsedDisplayMillis;
 elapsedMillis ellapsedKnobTouchMillis;
 elapsedMillis ellapsedMetroMillis;
@@ -23,8 +21,9 @@ uint32_t metroStepTime = 11; //
 
 void setup() {
   Serial.begin(38400);
-  // MIDI Controllers should discard incoming MIDI messages.
+
   while (usbMIDI.read()) {
+    // figure out what to do with midi clock....
   }
 
   // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
@@ -41,11 +40,9 @@ void setup() {
   pinMode(LED, OUTPUT);
   digitalWrite(LED, ledState);
 
-
   menu.init(); 
-  setupMenu();
-  menu.drawMenu();
-  display.display();
+  setupMainMenu();
+  // setupKnobMenu(knobs);
 }
 
 void loop() {
@@ -53,33 +50,53 @@ void loop() {
 
   buttonCancel.update();
   buttonOkay.update();
-  if (buttonCancel.fallingEdge()) {
+  if (buttonCancel.pressed()) {
+    Serial.println("canceled");
+    menu.registerKeyPress(GEM_KEY_CANCEL);
     // button A pressed
   }
-  if (buttonOkay.fallingEdge()) {
+  if (buttonOkay.pressed()) {
+    Serial.println("okayed");
+    menu.registerKeyPress(GEM_KEY_OK);
     // button pressed
   }
-  
 
-  for (int i = 0; i < 16; i++) {
-    // Encoder encoder = *encoders[i];
-    // long newKnobValue = encoder.read();
-    long newKnobValue = encoders[i]->read();
-    if (newKnobValue != knobs[i]->prev_val) {
-      knobsDirty = true;
-      ellapsedKnobTouchMillis = 0;
-      screenSaver = false;
-      knobs[i]->prev_val = newKnobValue;
-      usbMIDI.sendControlChange(knobs[i]->cc, newKnobValue, MIDI_CHANNEL);
-      ledState = HIGH;
-      digitalWrite(LED, ledState);
-      ledMetro.interval(250);
-      String knobtext = "knob " + String(i + 1) + ": " + String(newKnobValue);
-      // drawText(knobtext, 1);
-      Serial.println(knobtext);
-      // drawText(knobtext, 9 * (i + 2));
+  long newControlKnobValue = controlKnob.read();
+  if ((newControlKnobValue != controlKnobValue) && ((newControlKnobValue - controlKnobValue) % 4 == 0)) {
+    if (curMode != "PERFORMANCE") {
+        if (newControlKnobValue > controlKnobValue) {
+          Serial.println("menu down");
+          menu.registerKeyPress(GEM_KEY_DOWN);
+          display.display();
+        } else {
+          Serial.println("menu up");
+          menu.registerKeyPress(GEM_KEY_UP);
+          display.display();
+        }
+        controlKnobValue = newControlKnobValue;
+        Serial.print("controlKnob = ");
+        Serial.print(controlKnobValue);
+        Serial.println();
+      }
     }
-  }
+
+  // for (int i = 0; i < 16; i++) {
+  //   long newKnobValue = encoders[i]->read();
+  //   if (newKnobValue != knobs[i]->value) {
+  //     knobsDirty = true;
+  //     ellapsedKnobTouchMillis = 0;
+  //     screenSaver = false;
+  //     knobs[i]->value = newKnobValue;
+  //     usbMIDI.sendControlChange(knobs[i]->cc, newKnobValue, MIDI_CHANNEL);
+  //     ledState = HIGH;
+  //     digitalWrite(LED, ledState);
+  //     ledMetro.interval(250);
+  //     String knobtext = "knob " + String(i + 1) + ": " + String(newKnobValue);
+  //     // drawText(knobtext, 1);
+  //     Serial.println(knobtext);
+  //     // drawText(knobtext, 9 * (i + 2));
+  //   }
+  // }
 
   if (ledMetro.check() == 1) {
     ledState = LOW;
@@ -87,10 +104,11 @@ void loop() {
   }
 
   // screen cycle
-  if (screenDirty && !screenSaver && (ellapsedDisplayMillis > screenStepTime)) {
+  if (screenDirty && (ellapsedDisplayMillis > screenStepTime)) {
     // update display
     // Serial.println("updating display");
     ellapsedDisplayMillis = ellapsedDisplayMillis - screenStepTime;
+    display.display();
   }
 
   // lfo cycle
@@ -122,4 +140,33 @@ void loop() {
     Serial.println("screensaver on ");
   }
 
+  if (curMode == "MAIN_MENU") {
+    menu.drawMenu();
+    screenDirty = true;
+  } else if (curMode == "PERFORMANCE") {
+    int i = 0;
+    String knobtext = "knob " + String(i + 1) + ": " + String(knobs[i]->value);
+    drawText(knobtext, 1);
+    String controlKnobText = "control knob :" + String(controlKnobValue);
+    drawText(controlKnobText, 3);
+
+  } else if (curMode == "KNOB") {
+    // knobMenu.drawMenu();
+    // screenDirty = true;
+  } else if (curMode == "TEMPO") {
+    // tempoMenu.drawMenu();
+    // screenDirty = true;
+  }
+
+  if (Serial.available()) {
+    char ch = Serial.read();
+    Serial.print(ch);
+    if(ch){ ellapsedKnobTouchMillis = 0;}
+    if(ch == 'w'){ menu.registerKeyPress(GEM_KEY_UP);}
+    if(ch == 'a'){ menu.registerKeyPress(GEM_KEY_LEFT);}
+    if(ch == 'd'){ menu.registerKeyPress(GEM_KEY_RIGHT);}
+    if(ch == 's'){ menu.registerKeyPress(GEM_KEY_DOWN);}
+    if(ch == 'z'){ menu.registerKeyPress(GEM_KEY_CANCEL);}
+    if(ch == 'c'){ menu.registerKeyPress(GEM_KEY_OK);}
+  }
 }
