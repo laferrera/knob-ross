@@ -3,6 +3,7 @@
 #define MENU_H
 #include <GEM_adafruit_gfx.h>
 #include <vector>
+#include <string>
 
 String modes[] = {"MAIN_MENU", "PERFORMANCE", "KNOB", "TEMPO", "LEARN", "GLOBAL", "TWO_HEADED_MONSTER"};
 String curMode = "MAIN_MENU";
@@ -74,10 +75,10 @@ void setupMainMenu() {
 
 
 void setupKnobMenu(Knob *knobs[]){
-  
+
   // Serial.print("Knob1 Value: " + String(knobs[0]->value));
   // for (int i = 0; i < sizeof(*knobs); i++) {
-  for (int i = 0; i < 2; i++) {    
+  for (int i = 0; i < 9; i++) {    
     // knobsMenuPage.addMenuItem(knobPageLinkTest);
     // GEMPage knobPage("Knob 0");
     // pages.push_back(knobPage);
@@ -85,20 +86,28 @@ void setupKnobMenu(Knob *knobs[]){
     // items.push_back(knobPageLink);
     // knobsMenuPage.addMenuItem(items.back());
 
-    String knobPageName = "Knob " + String(i);
-    char *cString = const_cast<char *>(knobPageName.c_str());
-    GEMPage knobPage(cString);
-    pages.push_back(knobPage);
-    GEMItem knobPageLink(cString, pages.back());
-    items.push_back(knobPageLink);
-    knobsMenuPage.addMenuItem(items.back());
-    Serial.println(pages.back().getTitle());
+    String knobName = "Knob " + String(i);
+    // const char *knobStr = knobName.c_str();
+    char *knobStr = knobName.c_str();
+    GEMPage *knobPage = new GEMPage(knobStr); 
+    GEMItem *knobPageLink = new GEMItem(knobStr, knobPage);
+    knobsMenuPage.addMenuItem(*knobPageLink);
+
+    // String knobPageName = "Knob " + String(i);
+    // char *cString = const_cast<char *>(knobPageName.c_str());
+    // GEMPage *knobPage = new GEMPage(cString);
+    // pages.push_back(*knobPage);
+    // GEMItem *knobPageLink = new GEMItem(cString, *knobPage);
+    // items.push_back(*knobPageLink);
+    // knobsMenuPage.addMenuItem(*knobPageLink);
+
+    // Serial.print("In Knob Setup, current page title:");
+    // Serial.println(pages.back().getTitle());
     // GEMItem knobValue("Print", printData);
     // items.push_back(knobValue);
     // pages[i].addMenuItem(items.back());
 
     // knobsMenuPage.addMenuItem(items[i]);
-    menu.reInit();
 
 
 

@@ -43,7 +43,15 @@ void setup() {
   menu.init(); 
   setupKnobMenu(knobs);
   setupMainMenu();
-  Serial.println("setup complete");
+  // Serial.println("pages vector count: ");
+  // Serial.println(pages.size());
+  // Serial.println("pages vector[0] title: ");
+  // Serial.println(pages[0].getTitle());
+  // Serial.printf("%p", &pages[0]);
+  // Serial.println("pages vector[1] title: ");
+  // Serial.println(pages[1].getTitle());
+  // Serial.printf("%p", &pages[1]);
+  // Serial.println("setup complete");
 }
 
 void loop() {
