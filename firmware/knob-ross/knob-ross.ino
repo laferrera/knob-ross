@@ -41,8 +41,9 @@ void setup() {
   digitalWrite(LED, ledState);
 
   menu.init(); 
-  setupMainMenu();
   setupKnobMenu(knobs);
+  setupMainMenu();
+  Serial.println("setup complete");
 }
 
 void loop() {
@@ -132,13 +133,13 @@ void loop() {
   // menu.drawMenu();
 
   // screensaver cycle
-  if (!screenSaver && (ellapsedKnobTouchMillis > SCREEN_SAVER_TIMEOUT_MS)) {
-    // update display
-    screenSaver = true;
-    display.fillScreen(SSD1306_BLACK);
-    display.display();
-    Serial.println("screensaver on ");
-  }
+  // if (!screenSaver && (ellapsedKnobTouchMillis > SCREEN_SAVER_TIMEOUT_MS)) {
+  //   // update display
+  //   screenSaver = true;
+  //   display.fillScreen(SSD1306_BLACK);
+  //   display.display();
+  //   Serial.println("screensaver on ");
+  // }
 
   if (curMode == "MAIN_MENU") {
     menu.drawMenu();
