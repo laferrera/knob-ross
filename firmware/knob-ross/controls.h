@@ -38,6 +38,7 @@ struct Knob {
   int phase;
   int minValue;
   uint8_t maxValue;
+  bool lfoEnabled;
   int offset;
   uint8_t lfoType;
   uint8_t knobDestination;
@@ -68,13 +69,16 @@ void initializeKnobs(void){
   // initiaize knobs, should probably do this for banks.
   for (int i = 0; i < 16; i++) {
     Knob knob;
-    knob.value = -999;
+    knob.value = 0;
     knob.cc = 102 + i;
     knob.phase = 0;
+    knob.lfoEnabled = false;
     knob.lfoType = 0;
     knob.minValue = 0;
     knob.maxValue = 127;
     knob.offset = 0;
+    knob.knobDestination = 0;
+    knob.lfoDestination = 0;
     *knobs[i] = knob;
   }
 }

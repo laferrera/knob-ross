@@ -71,7 +71,8 @@ void loop() {
   }
 
   long newControlKnobValue = controlKnob.read();
-  if ((newControlKnobValue != controlKnobValue) && ((newControlKnobValue - controlKnobValue) % 4 == 0)) {
+  // if ((newControlKnobValue != controlKnobValue) && ((newControlKnobValue - controlKnobValue) % 4 == 0)) {
+  if (newControlKnobValue != controlKnobValue) {
     if (curMode != "PERFORMANCE") {
         if (newControlKnobValue > controlKnobValue) {
           Serial.println("menu down");
@@ -87,7 +88,7 @@ void loop() {
         Serial.print(controlKnobValue);
         Serial.println();
       }
-    }
+  }
 
   // for (int i = 0; i < 16; i++) {
   //   long newKnobValue = encoders[i]->read();
