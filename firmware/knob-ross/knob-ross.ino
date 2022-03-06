@@ -55,14 +55,10 @@ void loop() {
   if (buttonCancel.pressed()) {
     Serial.println("canceled");
     screenDirty = true;
-    menu.registerKeyPress(GEM_KEY_CANCEL);
-    // button A pressed
   }
   if (buttonOkay.pressed()) {
-    Serial.println("okayed");
     screenDirty = true;
     menu.registerKeyPress(GEM_KEY_OK);
-    // button pressed
   }
 
   long newControlKnobValue = controlKnob.read();
@@ -70,18 +66,13 @@ void loop() {
   // if (newControlKnobValue != controlKnobValue) {
     if (curMode != "PERFORMANCE") {
         if (newControlKnobValue > controlKnobValue) {
-          Serial.println("menu down");
           menu.registerKeyPress(GEM_KEY_DOWN);
           screenDirty = true;
         } else {
-          Serial.println("menu up");
           menu.registerKeyPress(GEM_KEY_UP);
           screenDirty = true;
         }
         controlKnobValue = newControlKnobValue;
-        Serial.print("controlKnob = ");
-        Serial.print(controlKnobValue);
-        Serial.println();
       }
   }
 
