@@ -2,6 +2,7 @@
 #include "display.h"
 #include "controls.h"
 #include "menu.h"
+#include "lfo.h"
 
 #define LED 13
 int ledState = HIGH;
@@ -13,11 +14,12 @@ Metro ledMetro = Metro(250);
 elapsedMillis ellapsedDisplayMillis;
 elapsedMillis ellapsedKnobTouchMillis;
 elapsedMillis ellapsedMetroMillis;
-elapsedMillis ellapsedLfoMillis;
+// elapsedMillis ellapsedLfoMillis;
+elapsedMicros ellapsedLfoMicros;
 
 uint32_t screenStepTime = 6; // ~15fps
-uint32_t lfoStepTime = 7;    //
 uint32_t metroStepTime = 11; //
+uint32_t lfoStepTime = 100;  // 100 microseconds is 10khz
 
 void setup() {
   Serial.begin(38400);
@@ -39,6 +41,8 @@ void setup() {
 
   pinMode(LED, OUTPUT);
   digitalWrite(LED, ledState);
+
+  setupLfos();
 
   menu.init(); 
   setupKnobMenu(knobs);
@@ -108,10 +112,9 @@ void loop() {
   }
 
   // lfo cycle
-  if (ellapsedLfoMillis > lfoStepTime) {
-    // update display
-    // Serial.println("computing lfos");
-    ellapsedLfoMillis = ellapsedLfoMillis - lfoStepTime;
+  if (ellapsedLfoMicros > lfoStepTime) {
+    processLfos();
+    ellapsedLfoMicros = ellapsedLfoMicros - lfoStepTime;
   }
 
   // metro cycle
