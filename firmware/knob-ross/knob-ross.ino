@@ -43,15 +43,8 @@ void setup() {
   menu.init(); 
   setupKnobMenu(knobs);
   setupMainMenu();
-  // Serial.println("pages vector count: ");
-  // Serial.println(pages.size());
-  // Serial.println("pages vector[0] title: ");
-  // Serial.println(pages[0].getTitle());
-  // Serial.printf("%p", &pages[0]);
-  // Serial.println("pages vector[1] title: ");
-  // Serial.println(pages[1].getTitle());
-  // Serial.printf("%p", &pages[1]);
-  // Serial.println("setup complete");
+  menu.drawMenu();
+  screenDirty = true;
 }
 
 void loop() {
@@ -61,27 +54,29 @@ void loop() {
   buttonOkay.update();
   if (buttonCancel.pressed()) {
     Serial.println("canceled");
+    screenDirty = true;
     menu.registerKeyPress(GEM_KEY_CANCEL);
     // button A pressed
   }
   if (buttonOkay.pressed()) {
     Serial.println("okayed");
+    screenDirty = true;
     menu.registerKeyPress(GEM_KEY_OK);
     // button pressed
   }
 
   long newControlKnobValue = controlKnob.read();
-  // if ((newControlKnobValue != controlKnobValue) && ((newControlKnobValue - controlKnobValue) % 4 == 0)) {
-  if (newControlKnobValue != controlKnobValue) {
+  if ((newControlKnobValue != controlKnobValue) && (abs(newControlKnobValue - controlKnobValue) > 4)) {
+  // if (newControlKnobValue != controlKnobValue) {
     if (curMode != "PERFORMANCE") {
         if (newControlKnobValue > controlKnobValue) {
           Serial.println("menu down");
           menu.registerKeyPress(GEM_KEY_DOWN);
-          display.display();
+          screenDirty = true;
         } else {
           Serial.println("menu up");
           menu.registerKeyPress(GEM_KEY_UP);
-          display.display();
+          screenDirty = true;
         }
         controlKnobValue = newControlKnobValue;
         Serial.print("controlKnob = ");
@@ -151,8 +146,8 @@ void loop() {
   // }
 
   if (curMode == "MAIN_MENU") {
-    menu.drawMenu();
-    screenDirty = true;
+//    menu.drawMenu();
+    
   } else if (curMode == "PERFORMANCE") {
     int i = 0;
     String knobtext = "knob " + String(i + 1) + ": " + String(knobs[i]->value);

@@ -1,7 +1,8 @@
 #pragma once
 #ifndef MENU_H
 #define MENU_H
-#include <GEM_adafruit_gfx.h>
+#include "src/GEM/GEM_adafruit_gfx.h"
+// #include <GEM_adafruit_gfx.h>
 #include <vector>
 #include <string>
 
@@ -70,8 +71,8 @@ void setupMainMenu() {
   mainMenuPage.addMenuItem(learnMenuLink);
   mainMenuPage.addMenuItem(globalMenuLink);
   mainMenuPage.addMenuItem(twoHeadedMonsterMenuLink);
-  mainMenuPage.addMenuItem(menuItemSelect);
-  mainMenuPage.addMenuItem(menuItemInt);
+  // mainMenuPage.addMenuItem(menuItemSelect);
+  // mainMenuPage.addMenuItem(menuItemInt);
   menu.setMenuPageCurrent(mainMenuPage);
 }
 
