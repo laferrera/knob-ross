@@ -82,11 +82,11 @@ void loop() {
 
   // for (int i = 0; i < 16; i++) {
   //   long newKnobValue = encoders[i]->read();
-  //   if (newKnobValue != knobs[i]->value) {
+  //   if (newKnobValue != knobs[i]->encoder_value) {
   //     knobsDirty = true;
   //     ellapsedKnobTouchMillis = 0;
   //     screenSaver = false;
-  //     knobs[i]->value = newKnobValue;
+  //     knobs[i]->encoder_value = newKnobValue;
   //     usbMIDI.sendControlChange(knobs[i]->cc, newKnobValue, MIDI_CHANNEL);
   //     ledState = HIGH;
   //     digitalWrite(LED, ledState);
@@ -113,6 +113,18 @@ void loop() {
   }
 
 // then do a calc cycle coupled with a midi send cycle...
+// two loops
+// first loop goes through all the knobs in order and gets output value / destination and accumulates it in variable for each knob
+// second loop goes through accumulatied values
+  // if accums.knob1 != accums_previous.knob1
+  //   do calculcation on accums.knob1
+  // gotta scale the value if other knobs are touching the knob.value.... 
+  // i..e if knob2.lfo out goes to knob1.value, the new max value is 2....
+  // is that right?
+  //   send midi / change CV
+// accums_previous = accums;
+// probably sets accumulation back to zero? 
+
 
 
   // metro cycle
@@ -146,7 +158,7 @@ void loop() {
     
   } else if (curMode == "PERFORMANCE") {
     int i = 0;
-    String knobtext = "knob " + String(i + 1) + ": " + String(knobs[i]->value);
+    String knobtext = "knob " + String(i + 1) + ": " + String(knobs[i]->encoder_value);
     drawText(knobtext, 1);
     String controlKnobText = "control knob :" + String(controlKnobValue);
     drawText(controlKnobText, 3);

@@ -33,25 +33,23 @@ Button buttonCancel = Button();
 Button buttonOkay = Button();
 
 struct Knob {
-  int value;
-  uint8_t cc;
-  int minValue;
-  uint8_t maxValue;
-  int phase;
-  bool lfoEnabled;
-  uint8_t lfoWave;
-  float lfoAmp;
-  bool lfoFreqBPM;
-  int lfoFreq;
-  int lfoFreqNoteValue; // bar, 1/2, 1/4, 1/8, 1/16, 1/32, 1/64, 1/128
-  uint8_t lfoFreqNoteValueAmount; // 1-16 1/4 notes.... 
-  int offset;
-  Knob* knobDestination;
-  uint8_t lfoDestination;
-  // lfo amp
-  // lfo freq 
+  int output_value; // 0 - 127 for midi
+  int encoder_value; // -infinity to +infinity
+  uint8_t cc; // 102 -128 ?
+  int phase; // i think this is -π to +π
+  bool lfoEnabled; // true | false 
+  uint8_t lfoWave; // 0 - 6 for lfo wave
+  float lfoAmp; // -1 to 1
+  float lfoAmpOffset; // -1 to 1 - this shifts the lfo output wave up
+  bool lfoFreqBPM; // true | false / either BPM or Hz
+  float lfoFreq;   // hz .0005 - 50hz..... 33.333333333 minutes to 20ms
+  int lfoFreqBeatType; // bar, 1/2, 1/4, 1/8, 1/16, 1/32, 1/64
+  uint8_t lfoFreqBeatAmount; // 1-32 beats
+  int lfoFreqBeatOffset;     // 1/64 - 1/32 - 1/16 - 1/8 - 1/4 - 1/2 - look at this how Reason does this...
+  uint8_t encoderDestination; // i.e. knob controls value / amp / freq / offset / wave
+  Knob *knobDestination;      // which knob does the lfo control?
+  uint8_t lfoOutputDestination;  // which param on knob above does LFO control? amp / freq / offset / wave
   // lfo param? i.e. pulsewidth
-  // lfo time offset - is this the same as phase
 };
 
 struct Knob knob1, knob2, knob3, knob4, knob5, knob6, knob7, knob8, knob9, knob10, knob11, knob12, knob13, knob14, knob15, knob16;
@@ -64,16 +62,14 @@ void initializeKnobs(void){
   // initiaize knobs, should probably do this for banks.
   for (int i = 0; i < 16; i++) {
     Knob knob;
-    knob.value = 0;
+    knob.output_value = 0;
+    knob.encoder_value = 0;
     knob.cc = 102 + i;
-    knob.minValue = 0;
-    knob.maxValue = 127;
     knob.phase = 0;
     knob.lfoEnabled = false;
     knob.lfoWave = 0;
-    knob.offset = 0;
+    knob.lfoAmpOffset = 0;
     knob.knobDestination = 0;
-    knob.lfoDestination = 0;
     *knobs[i] = knob;
   }
 }

@@ -98,18 +98,12 @@ void setupKnobMenu(Knob *knobs[]){
     // char *knobStr = knobName.c_str();
     GEMPage *knobPage = new GEMPage(knobStr);
     GEMItem *knobPageLink = new GEMItem(knobStr, knobPage);
-    GEMItem *knobValue = new GEMItem("Value:", knobs[i]->value, twoFiveSixSelect);
-    GEMItem *knobMin = new GEMItem("Min:", knobs[i]->minValue, oneTwoEightSelect);
-    GEMItem *knobMax = new GEMItem("Max:", knobs[i]->maxValue, oneTwoEightSelect);
+    GEMItem *knobValue = new GEMItem("Value:", knobs[i]->output_value, twoFiveSixSelect);
     GEMItem *knobPhase = new GEMItem("Phase:", knobs[i]->phase, twoFiveSixSelect);
-    GEMItem *knobOffset = new GEMItem("Offset:", knobs[i]->offset, oneTwoEightSelect);
     GEMItem *knobCC = new GEMItem("CC:", knobs[i]->cc, oneTwoEightSelect);
 
     knobPage->addMenuItem(*knobValue);
-    knobPage->addMenuItem(*knobMin);
-    knobPage->addMenuItem(*knobMax);
     knobPage->addMenuItem(*knobPhase);
-    knobPage->addMenuItem(*knobOffset);
     knobPage->addMenuItem(*knobCC);
 
     knobsMenuPage.addMenuItem(*knobPageLink);
