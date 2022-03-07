@@ -21,6 +21,23 @@ float Oscillator::Process()
             break;
         case WAVE_RAMP: out = ((phase_ * TWO_PI_RECIP * 2.0f)) - 1.0f; break;
         case WAVE_SQUARE: out = phase_ < PI_F ? (1.0f) : -1.0f; break;
+        case WAVE_SMOOTH:
+          phase_ += freq_;
+          if (phase_ >= 1.0f) {
+            phase_ -= 1.0f;
+            last_out_ += interval_;
+            interval_ = rand() * kRandFrac * 2.0f - 1.0f - last_out_;
+          }
+          t = phase_ * phase_ * (3.0f - 2.0f * phase_);
+          out = last_out_ + interval_ * t; break;
+        case WAVE_RANDOM:
+          phase_ += freq_;
+          if (phase_ >= 1.0f) {
+            phase_ -= 1.0f;
+            last_out_ = rand() * kRandFrac * 2.0f - 1.0f;
+          }
+          t = phase_ * phase_ * (3.0f - 2.0f * phase_);
+          out = last_out_; break;
         case WAVE_POLYBLEP_TRI:
             t   = phase_ * TWO_PI_RECIP;
             out = phase_ < PI_F ? 1.0f : -1.0f;

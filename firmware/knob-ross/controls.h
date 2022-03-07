@@ -35,35 +35,30 @@ Button buttonOkay = Button();
 struct Knob {
   int value;
   uint8_t cc;
-  int phase;
   int minValue;
   uint8_t maxValue;
+  int phase;
   bool lfoEnabled;
+  uint8_t lfoWave;
+  float lfoAmp;
+  bool lfoFreqBPM;
+  int lfoFreq;
+  int lfoFreqNoteValue; // bar, 1/2, 1/4, 1/8, 1/16, 1/32, 1/64, 1/128
+  uint8_t lfoFreqNoteValueAmount; // 1-16 1/4 notes.... 
   int offset;
-  uint8_t lfoType;
-  uint8_t knobDestination;
+  Knob* knobDestination;
   uint8_t lfoDestination;
+  // lfo amp
+  // lfo freq 
+  // lfo param? i.e. pulsewidth
+  // lfo time offset - is this the same as phase
 };
 
-struct Knob knob1;
-struct Knob knob2;
-struct Knob knob3;
-struct Knob knob4;
-struct Knob knob5;
-struct Knob knob6;
-struct Knob knob7;
-struct Knob knob8;
-struct Knob knob9;
-struct Knob knob10;
-struct Knob knob11;
-struct Knob knob12;
-struct Knob knob13;
-struct Knob knob14;
-struct Knob knob15;
-struct Knob knob16;
+struct Knob knob1, knob2, knob3, knob4, knob5, knob6, knob7, knob8, knob9, knob10, knob11, knob12, knob13, knob14, knob15, knob16;
 
 Encoder *encoders[17] = {&enc1, &enc2, &enc3, &enc4, &enc5, &enc6, &enc7, &enc8, &enc9, &enc10, &enc11, &enc12, &enc13, &enc14, &enc15, &enc16};
 Knob *knobs[16] = {&knob1, &knob2, &knob3, &knob4, &knob5, &knob6, &knob7, &knob8, &knob9, &knob10, &knob11, &knob12, &knob13, &knob14, &knob15, &knob16};
+String lfoDestination[] = {"FREQ", "AMP", "PHASE", "OFFSET"};
 
 void initializeKnobs(void){
   // initiaize knobs, should probably do this for banks.
@@ -71,11 +66,11 @@ void initializeKnobs(void){
     Knob knob;
     knob.value = 0;
     knob.cc = 102 + i;
-    knob.phase = 0;
-    knob.lfoEnabled = false;
-    knob.lfoType = 0;
     knob.minValue = 0;
     knob.maxValue = 127;
+    knob.phase = 0;
+    knob.lfoEnabled = false;
+    knob.lfoWave = 0;
     knob.offset = 0;
     knob.knobDestination = 0;
     knob.lfoDestination = 0;
@@ -92,6 +87,8 @@ void initializeButtons(void){
   buttonCancel.setPressedState(LOW);
   buttonOkay.setPressedState(LOW);
 }
+
+
 
 
 #endif

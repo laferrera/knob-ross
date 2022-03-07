@@ -2,6 +2,7 @@
 #ifndef DSY_OSCILLATOR_H
 #define DSY_OSCILLATOR_H
 #include <stdint.h>
+#include <stdlib.h>
 #include "dsp.h"
 #ifdef __cplusplus
 
@@ -23,6 +24,8 @@ class Oscillator
         WAVE_SAW,
         WAVE_RAMP,
         WAVE_SQUARE,
+        WAVE_SMOOTH,
+        WAVE_RANDOM,
         WAVE_POLYBLEP_TRI,
         WAVE_POLYBLEP_SAW,
         WAVE_POLYBLEP_SQUARE,
@@ -48,6 +51,7 @@ class Oscillator
         phase_     = 0.0f;
         phase_inc_ = CalcPhaseInc(freq_);
         waveform_  = WAVE_SIN;
+        interval_ = 0.0f; // for smooth random
         eoc_       = true;
         eor_       = true;
     }
@@ -107,6 +111,8 @@ class Oscillator
     float   sr_, sr_recip_, phase_, phase_inc_;
     float   last_out_, last_freq_;
     bool    eor_, eoc_;
+    static constexpr float kRandFrac = 1.f / (float)RAND_MAX; // for smooth random
+    float interval_; // for smooth random
 };
 } // namespace daisysp
 #endif

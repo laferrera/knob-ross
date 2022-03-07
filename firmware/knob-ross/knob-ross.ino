@@ -98,11 +98,6 @@ void loop() {
   //   }
   // }
 
-  if (ledMetro.check() == 1) {
-    ledState = LOW;
-    digitalWrite(LED, ledState);
-  }
-
   // screen cycle
   if (screenDirty && (ellapsedDisplayMillis > screenStepTime)) {
     // update display
@@ -111,14 +106,21 @@ void loop() {
     display.display();
   }
 
-  // lfo cycle
+  // lfo cycle - do this at 10khz
   if (ellapsedLfoMicros > lfoStepTime) {
     processLfos();
     ellapsedLfoMicros = ellapsedLfoMicros - lfoStepTime;
   }
 
+// then do a calc cycle coupled with a midi send cycle...
+
+
   // metro cycle
   if (ellapsedMetroMillis > metroStepTime) {
+    if (ledMetro.check() == 1) {
+      ledState = LOW;
+      digitalWrite(LED, ledState);
+    }
     // update metro
     // Serial.println("metro stuff");
     ellapsedMetroMillis = ellapsedMetroMillis - metroStepTime;
