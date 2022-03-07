@@ -32,6 +32,8 @@ int buttonOkayPin = 12;
 Button buttonCancel = Button();
 Button buttonOkay = Button();
 
+
+//maybe lets call this a channel
 struct Knob {
   int output_value; // 0 - 127 for midi
   int encoder_value; // -infinity to +infinity
@@ -46,8 +48,8 @@ struct Knob {
   int lfoFreqBeatType; // bar, 1/2, 1/4, 1/8, 1/16, 1/32, 1/64
   uint8_t lfoFreqBeatAmount; // 1-32 beats
   int lfoFreqBeatOffset;     // 1/64 - 1/32 - 1/16 - 1/8 - 1/4 - 1/2 - look at this how Reason does this...
-  uint8_t encoderDestination; // i.e. knob controls value / amp / freq / offset / wave
-  Knob *knobDestination;      // which knob does the lfo control?
+  uint8_t encoderDestination; // i.e. knob controls midi cc / lfo amp / lfo freq / lfo offset / wave
+  Knob *knobDestination;      // which knob does the lfo control? 
   uint8_t lfoOutputDestination;  // which param on knob above does LFO control? amp / freq / offset / wave
   // lfo param? i.e. pulsewidth
 };
