@@ -120,27 +120,27 @@ void loop() {
     // // then do a calc cycle coupled with a midi send cycle...
     // // two loops
     // // first loop goes through all the channels in order and gets output value / destination and accumulates it in variable for each channel
-    // for (uint8_t i = 0; i < NUM_OF_CHANNELS; i++) {
-    //   int channelOutputIndex = channels[i]->channelDestination->index;
+    for (uint8_t i = 0; i < NUM_OF_CHANNELS; i++) {
+      int channelOutputIndex = channels[i]->channelDestination->index;
     //   // gotta scale the value if other channels are touching the channel.value....
     //   // i..e if channel2.lfo out goes to channel1.value, the new max value is 2....
     //   // so maybe need a vector?
-    //   channelAccumulator[channelOutputIndex] += channels[i]->outputValue;
-    //   channelScaler[channelOutputIndex] += 1;
-    // }
+      channelAccumulator[channelOutputIndex] += channels[i]->outputValue;
+      channelScaler[channelOutputIndex] += 1;
+    }
     //   // second loop goes through accumulatied values
-    // for (uint8_t i = 0; i < NUM_OF_CHANNELS; i++) {
-    //   if(channelAccumulator[i] != prevChannelAccumulator[i]){
-    //     //   do calculcation on accums.channel1
-    //     usbMIDI.sendControlChange(channels[i]->cc, channelAccumulator[i], MIDI_CHANNEL);
-    //   }
-    // }
+    for (uint8_t i = 0; i < NUM_OF_CHANNELS; i++) {
+      if(channelAccumulator[i] != prevChannelAccumulator[i]){
+        //   do calculcation on accums.channel1
+        //     usbMIDI.sendControlChange(channels[i]->cc, channelAccumulator[i], MIDI_CHANNEL);
+      }
+    }
     // // prevChannelAccumulator = channelAccumulator;
     // std::copy(std::begin(channelAccumulator), std::end(channelAccumulator), std::begin(prevChannelAccumulator));
 
     // // reset the accumulator
-    // memset(channelAccumulator, 0, sizeof(channelAccumulator));
-    // memset(channelScaler, 0, sizeof(channelScaler));
+    memset(channelAccumulator, 0, sizeof(channelAccumulator));
+    memset(channelScaler, 0, sizeof(channelScaler));
     // // memset(myarray, 0, N * sizeof(*myarray)); // for heap-allocated arrays, where N is the number of elements
     // // std::fill(myarray, myarray + N, 0);
     }

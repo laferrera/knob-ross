@@ -78,7 +78,7 @@ void initializeChannels(void){
     channel.lfoEnabled = false;
     channel.lfoWave = 0;
     channel.lfoAmpOffset = 0;
-    channel.channelDestination = 0;
+    channel.channelDestination = &channel;
     *channels[i] = channel;
   }
 }
