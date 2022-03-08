@@ -12,12 +12,15 @@ Metro ledMetro = Metro(250);
 
 // unsigned long lastTimeDisplayMillis = millis();
 elapsedMillis ellapsedDisplayMillis;
-elapsedMillis ellapsedKnobTouchMillis;
+elapsedMillis ellaspedChannelCalcMillis;
+// elapsedMillis ellapsedMidiSendMillis;
+elapsedMillis ellapsedEncoderTouchMillis;
 elapsedMillis ellapsedMetroMillis;
-// elapsedMillis ellapsedLfoMillis;
 elapsedMicros ellapsedLfoMicros;
 
 uint32_t screenStepTime = 6; // ~15fps
+uint32_t channelCalcStepTime = 7;
+// uint32_t midiSendStepTime = 13; 
 uint32_t metroStepTime = 11; //
 uint32_t lfoStepTime = 100;  // 100 microseconds is 10khz
 
@@ -36,7 +39,7 @@ void setup() {
   }
 
   startupScreen();
-  initializeKnobs();
+  initializeChannels();
   initializeButtons();
 
   pinMode(LED, OUTPUT);
@@ -45,7 +48,7 @@ void setup() {
   setupLfos();
 
   menu.init(); 
-  setupKnobMenu(knobs);
+  setupChannelMenu(channels);
   setupMainMenu();
   menu.drawMenu();
   screenDirty = true;
@@ -65,36 +68,36 @@ void loop() {
     menu.registerKeyPress(GEM_KEY_OK);
   }
 
-  long newControlKnobValue = controlKnob.read();
-  if ((newControlKnobValue != controlKnobValue) && (abs(newControlKnobValue - controlKnobValue) > 4)) {
-  // if (newControlKnobValue != controlKnobValue) {
+  long newControlChannelValue = controlChannel.read();
+  if ((newControlChannelValue != controlChannelValue) && (abs(newControlChannelValue - controlChannelValue) > 4)) {
+  // if (newControlChannelValue != controlChannelValue) {
     if (curMode != "PERFORMANCE") {
-        if (newControlKnobValue > controlKnobValue) {
+        if (newControlChannelValue > controlChannelValue) {
           menu.registerKeyPress(GEM_KEY_DOWN);
           screenDirty = true;
         } else {
           menu.registerKeyPress(GEM_KEY_UP);
           screenDirty = true;
         }
-        controlKnobValue = newControlKnobValue;
+        controlChannelValue = newControlChannelValue;
       }
   }
 
-  // for (int i = 0; i < 16; i++) {
-  //   long newKnobValue = encoders[i]->read();
-  //   if (newKnobValue != knobs[i]->encoder_value) {
-  //     knobsDirty = true;
-  //     ellapsedKnobTouchMillis = 0;
+  // for (int i = 0; i < SIZE_OF_CHANNELS; i++) {
+  //   long newChannelValue = encoders[i]->read();
+  //   if (newChannelValue != channels[i]->encoder_value) {
+  //     channelsDirty = true;
+  //     ellapsedEncoderTouchMillis = 0;
   //     screenSaver = false;
-  //     knobs[i]->encoder_value = newKnobValue;
-  //     usbMIDI.sendControlChange(knobs[i]->cc, newKnobValue, MIDI_CHANNEL);
+  //     channels[i]->encoderValue = newChannelValue;
+  //     usbMIDI.sendControlChange(channels[i]->cc, newChannelValue, MIDI_CHANNEL);
   //     ledState = HIGH;
   //     digitalWrite(LED, ledState);
   //     ledMetro.interval(250);
-  //     String knobtext = "knob " + String(i + 1) + ": " + String(newKnobValue);
-  //     // drawText(knobtext, 1);
-  //     Serial.println(knobtext);
-  //     // drawText(knobtext, 9 * (i + 2));
+  //     String channeltext = "channel " + String(i + 1) + ": " + String(newChannelValue);
+  //     // drawText(channeltext, 1);
+  //     Serial.println(channeltext);
+  //     // drawText(channeltext, 9 * (i + 2));
   //   }
   // }
 
@@ -112,74 +115,102 @@ void loop() {
     ellapsedLfoMicros = ellapsedLfoMicros - lfoStepTime;
   }
 
-// then do a calc cycle coupled with a midi send cycle...
-// two loops
-// first loop goes through all the knobs in order and gets output value / destination and accumulates it in variable for each knob
-// second loop goes through accumulatied values
-  // if accums.knob1 != accums_previous.knob1
-  //   do calculcation on accums.knob1
-  // gotta scale the value if other knobs are touching the knob.value.... 
-  // i..e if knob2.lfo out goes to knob1.value, the new max value is 2....
-  // is that right?
-  //   send midi / change CV
-// accums_previous = accums;
-// probably sets accumulation back to zero? 
-
-
-
-  // metro cycle
-  if (ellapsedMetroMillis > metroStepTime) {
-    if (ledMetro.check() == 1) {
-      ledState = LOW;
-      digitalWrite(LED, ledState);
-    }
-    // update metro
-    // Serial.println("metro stuff");
-    ellapsedMetroMillis = ellapsedMetroMillis - metroStepTime;
-  }
-
-  // check for incoming midi messages
-
-  
-  // Menu draw
-  // menu.drawMenu();
-
-  // screensaver cycle
-  // if (!screenSaver && (ellapsedKnobTouchMillis > SCREEN_SAVER_TIMEOUT_MS)) {
-  //   // update display
-  //   screenSaver = true;
-  //   display.fillScreen(SSD1306_BLACK);
-  //   display.display();
-  //   Serial.println("screensaver on ");
-  // }
-
-  if (curMode == "MAIN_MENU") {
-//    menu.drawMenu();
+  if (ellaspedChannelCalcMillis > channelCalcStepTime) {
     
-  } else if (curMode == "PERFORMANCE") {
-    int i = 0;
-    String knobtext = "knob " + String(i + 1) + ": " + String(knobs[i]->encoder_value);
-    drawText(knobtext, 1);
-    String controlKnobText = "control knob :" + String(controlKnobValue);
-    drawText(controlKnobText, 3);
+    // // then do a calc cycle coupled with a midi send cycle...
+    // // two loops
+    // // first loop goes through all the channels in order and gets output value / destination and accumulates it in variable for each channel
+    // for (uint8_t i = 0; i < NUM_OF_CHANNELS; i++) {
+    //   int channelOutputIndex = channels[i]->channelDestination->index;
+    //   // gotta scale the value if other channels are touching the channel.value....
+    //   // i..e if channel2.lfo out goes to channel1.value, the new max value is 2....
+    //   // so maybe need a vector?
+    //   channelAccumulator[channelOutputIndex] += channels[i]->outputValue;
+    //   channelScaler[channelOutputIndex] += 1;
+    // }
+    //   // second loop goes through accumulatied values
+    // for (uint8_t i = 0; i < NUM_OF_CHANNELS; i++) {
+    //   if(channelAccumulator[i] != prevChannelAccumulator[i]){
+    //     //   do calculcation on accums.channel1
+    //     usbMIDI.sendControlChange(channels[i]->cc, channelAccumulator[i], MIDI_CHANNEL);
+    //   }
+    // }
+    // // prevChannelAccumulator = channelAccumulator;
+    // std::copy(std::begin(channelAccumulator), std::end(channelAccumulator), std::begin(prevChannelAccumulator));
 
-  } else if (curMode == "KNOB") {
-    // knobMenu.drawMenu();
-    // screenDirty = true;
-  } else if (curMode == "TEMPO") {
-    // tempoMenu.drawMenu();
-    // screenDirty = true;
-  }
+    // // reset the accumulator
+    // memset(channelAccumulator, 0, sizeof(channelAccumulator));
+    // memset(channelScaler, 0, sizeof(channelScaler));
+    // // memset(myarray, 0, N * sizeof(*myarray)); // for heap-allocated arrays, where N is the number of elements
+    // // std::fill(myarray, myarray + N, 0);
+    }
 
-  if (Serial.available()) {
-    char ch = Serial.read();
-    Serial.print(ch);
-    if(ch){ ellapsedKnobTouchMillis = 0;}
-    if(ch == 'w'){ menu.registerKeyPress(GEM_KEY_UP);}
-    if(ch == 'a'){ menu.registerKeyPress(GEM_KEY_LEFT);}
-    if(ch == 'd'){ menu.registerKeyPress(GEM_KEY_RIGHT);}
-    if(ch == 's'){ menu.registerKeyPress(GEM_KEY_DOWN);}
-    if(ch == 'z'){ menu.registerKeyPress(GEM_KEY_CANCEL);}
-    if(ch == 'c'){ menu.registerKeyPress(GEM_KEY_OK);}
+    // metro cycle
+    if (ellapsedMetroMillis > metroStepTime) {
+      if (ledMetro.check() == 1) {
+        ledState = LOW;
+        digitalWrite(LED, ledState);
+      }
+      // update metro
+      // Serial.println("metro stuff");
+      ellapsedMetroMillis = ellapsedMetroMillis - metroStepTime;
+    }
+
+    // check for incoming midi messages
+
+    // Menu draw
+    // menu.drawMenu();
+
+    // screensaver cycle
+    // if (!screenSaver && (ellapsedEncoderTouchMillis > SCREEN_SAVER_TIMEOUT_MS)) {
+    //   // update display
+    //   screenSaver = true;
+    //   display.fillScreen(SSD1306_BLACK);
+    //   display.display();
+    //   Serial.println("screensaver on ");
+    // }
+
+    if (curMode == "MAIN_MENU") {
+      //    menu.drawMenu();
+
+    } else if (curMode == "PERFORMANCE") {
+      int i = 0;
+      String channeltext = "channel " + String(i + 1) + ": " + String(channels[i]->encoderValue);
+      drawText(channeltext, 1);
+      String controlChannelText = "control channel :" + String(controlChannelValue);
+      drawText(controlChannelText, 3);
+
+    } else if (curMode == "KNOB") {
+      // channelMenu.drawMenu();
+      // screenDirty = true;
+    } else if (curMode == "TEMPO") {
+      // tempoMenu.drawMenu();
+      // screenDirty = true;
+    }
+
+    if (Serial.available()) {
+      char ch = Serial.read();
+      Serial.print(ch);
+      if (ch) {
+        ellapsedEncoderTouchMillis = 0;
+      }
+      if (ch == 'w') {
+        menu.registerKeyPress(GEM_KEY_UP);
+      }
+      if (ch == 'a') {
+        menu.registerKeyPress(GEM_KEY_LEFT);
+      }
+      if (ch == 'd') {
+        menu.registerKeyPress(GEM_KEY_RIGHT);
+      }
+      if (ch == 's') {
+        menu.registerKeyPress(GEM_KEY_DOWN);
+      }
+      if (ch == 'z') {
+        menu.registerKeyPress(GEM_KEY_CANCEL);
+      }
+      if (ch == 'c') {
+        menu.registerKeyPress(GEM_KEY_OK);
+      }
+    }
   }
-}

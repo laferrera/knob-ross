@@ -70,15 +70,17 @@ void startupScreen(){
   display.setTextSize(1);              // Normal 1:1 pixel scale
   display.setTextColor(SSD1306_WHITE); // Draw white text
   display.setCursor(0, 9);
-  display.println("knob ross");
+  display.println("lo and behold   lo and behold");
   display.setCursor(0, 18);
-  display.println("     knob ross");
+  display.println("        lo and behold");
   display.setCursor(0, 27);
-  display.println("knob ross");
+  display.println("lo and behold   lo and behold");
   display.setCursor(0, 36);
-  display.println("     knob ross");
-  display.println("knob ross");
+  display.println("        lo and behold");
   display.setCursor(0, 45);
+  display.println("lo and behold   lo and behold");
+  display.setCursor(0, 54);
+  display.println("        lo and behold");
   display.display();
   delay(2000); // Pause for 2 seconds
   display.clearDisplay();

@@ -6,7 +6,7 @@
 #include <vector>
 #include <string>
 
-String modes[] = {"MAIN_MENU", "PERFORMANCE", "KNOB", "TEMPO", "LEARN", "GLOBAL", "TWO_HEADED_MONSTER"};
+String modes[] = {"MAIN_MENU", "PERFORMANCE", "CHANNEL", "TEMPO", "LEARN", "GLOBAL", "TWO_HEADED_MONSTER"};
 String curMode = "MAIN_MENU";
 
 // list<GEMPage> pages;
@@ -35,19 +35,19 @@ SelectOptionInt testSelectArr[] = {{"0", 0}, {"1", 1}, {"2", 2}, {"3", 3}};
 GEMPage mainMenuPage("Main Menu");
 void setModeToPerformance();
 GEMItem performanceMenuItemButton("TWIST", setModeToPerformance);
-GEMPage knobsMenuPage("KNOBZ");
+GEMPage channelsMenuPage("KNOBZ");
 GEMPage tempoMenuPage("TEMPO");
 GEMPage learnMenuPage("LEARN");
 GEMPage globalMenuPage("GLOBAL");
 GEMPage twoHeadedMonsterMenuPage("TWO_HEADED_MONSTER");
-GEMItem knobsMenuLink("KNOBZ", knobsMenuPage);
+GEMItem channelsMenuLink("KNOBZ", channelsMenuPage);
 GEMItem tempoMenuLink("TEMPO", tempoMenuPage);
 GEMItem learnMenuLink("LEARN", learnMenuPage);
 GEMItem globalMenuLink("GLOBAL", globalMenuPage);
 GEMItem twoHeadedMonsterMenuLink("TWO_HEADED_MONSTER", twoHeadedMonsterMenuPage);
 
-GEMPage knobPageTest("Knob0");
-GEMItem knobPageLinkTest("Knob0", knobPageTest);
+GEMPage channelPageTest("Channel0");
+GEMItem channelPageLinkTest("Channel0", channelPageTest);
 
 int selectNumber = 0;
 int intNumber = 0;
@@ -64,11 +64,11 @@ GEMItem menuItemButton("Print", printData);
 GEMPage menuPageMain("Main Menu");
 
 void setupMainMenu() {
-  knobsMenuPage.setParentMenuPage(mainMenuPage);
+  channelsMenuPage.setParentMenuPage(mainMenuPage);
   tempoMenuPage.setParentMenuPage(mainMenuPage);
   learnMenuPage.setParentMenuPage(mainMenuPage);
   globalMenuPage.setParentMenuPage(mainMenuPage);
-  mainMenuPage.addMenuItem(knobsMenuLink);
+  mainMenuPage.addMenuItem(channelsMenuLink);
   mainMenuPage.addMenuItem(performanceMenuItemButton);
   mainMenuPage.addMenuItem(tempoMenuLink);
   mainMenuPage.addMenuItem(learnMenuLink);
@@ -86,28 +86,28 @@ void setupMainMenu() {
 
 
 
-void setupKnobMenu(Knob *knobs[]){
+void setupChannelMenu(Channel *channels[]){
 
-  // Serial.print("Knob1 Value: " + String(knobs[0]->value));
-  // for (int i = 0; i < sizeof(*knobs); i++) {
+  // Serial.print("Channel1 Value: " + String(channels[0]->value));
+  // for (int i = 0; i < sizeof(*channels); i++) {
   for (int i = 0; i < 9; i++) {    
 
 
-    String knobName = "Knob " + String(i);
-    const char *knobStr = knobName.c_str();
-    // char *knobStr = knobName.c_str();
-    GEMPage *knobPage = new GEMPage(knobStr);
-    GEMItem *knobPageLink = new GEMItem(knobStr, knobPage);
-    GEMItem *knobValue = new GEMItem("Value:", knobs[i]->output_value, twoFiveSixSelect);
-    GEMItem *knobPhase = new GEMItem("Phase:", knobs[i]->phase, twoFiveSixSelect);
-    GEMItem *knobCC = new GEMItem("CC:", knobs[i]->cc, oneTwoEightSelect);
+    String channelName = "Channel " + String(i);
+    const char *channelStr = channelName.c_str();
+    // char *channelStr = channelName.c_str();
+    GEMPage *channelPage = new GEMPage(channelStr);
+    GEMItem *channelPageLink = new GEMItem(channelStr, channelPage);
+    GEMItem *channelValue = new GEMItem("Value:", channels[i]->outputValue, twoFiveSixSelect);
+    GEMItem *channelPhase = new GEMItem("Phase:", channels[i]->phase, twoFiveSixSelect);
+    GEMItem *channelCC = new GEMItem("CC:", channels[i]->cc, oneTwoEightSelect);
 
-    knobPage->addMenuItem(*knobValue);
-    knobPage->addMenuItem(*knobPhase);
-    knobPage->addMenuItem(*knobCC);
+    channelPage->addMenuItem(*channelValue);
+    channelPage->addMenuItem(*channelPhase);
+    channelPage->addMenuItem(*channelCC);
 
-    knobsMenuPage.addMenuItem(*knobPageLink);
-    knobPage->setParentMenuPage(knobsMenuPage);
+    channelsMenuPage.addMenuItem(*channelPageLink);
+    channelPage->setParentMenuPage(channelsMenuPage);
   }
 
   // min
@@ -120,7 +120,7 @@ void setupKnobMenu(Knob *knobs[]){
   // output
   //   midi cc
   //   cv out
-  //   other knob input (rate
+  //   other channel input (rate
 }
 
 void printData() {
