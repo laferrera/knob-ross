@@ -5,7 +5,9 @@
 
 #include <Bounce2.h>
 #include <Encoder.h>
+#include "lfo/oscillator.cpp"
 
+float samplerate = 10000.0f;
 int channelAccumulator[] = {0,0,0,0,0,0,0,0};
 int channelScaler[] = {0,0,0,0,0,0,0,0};
 int prevChannelAccumulator[] = {0,0,0,0,0,0,0,0};
@@ -57,6 +59,7 @@ struct Channel {
   uint8_t encoderDestination; // i.e. channel controls value / lfo amp / lfo freq / lfo offset / wave
   Channel *channelDestination;      // which channel does the lfo control? 
   uint8_t outputDestination;  // which param on channel above does the channel control? value / amp / freq / offset / wave
+  daisysp::Oscillator lfo;
   // lfo param? i.e. pulsewidth
 };
 
@@ -80,6 +83,7 @@ void initializeChannels(void){
     channel.lfoAmpOffset = 0;
     channel.channelDestination = &channel;
     *channels[i] = channel;
+    channel.lfo.Init(samplerate);
   }
 }
 
@@ -93,8 +97,14 @@ void initializeButtons(void){
   buttonOkay.setPressedState(LOW);
 }
 
-
-
+// lfo1Out = lfo1.Process(channels[i].lfoWave, channels[i].lfoAmp, channels[i].lfoFreq, channels[i].lfoFreqBeatType, channels[i].lfoFreqBeatAmount, channels[i].lfoFreqBeatOffset);
+void processLfos(void) {
+  for (uint8_t i = 0; i < NUM_OF_CHANNELS; i++) {
+    if (channels[i]->lfoEnabled) {
+      channels[i]->lfo.Process();
+    }
+  }
+}
 
 #endif
 

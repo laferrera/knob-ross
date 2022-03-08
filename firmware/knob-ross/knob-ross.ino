@@ -111,12 +111,12 @@ void loop() {
 
   // lfo cycle - do this at 10khz
   if (ellapsedLfoMicros > lfoStepTime) {
-    processLfos();
     ellapsedLfoMicros = ellapsedLfoMicros - lfoStepTime;
+    processLfos();
   }
 
   if (ellaspedChannelCalcMillis > channelCalcStepTime) {
-    
+    // Serial.println("lfo output" + String(channels[0]->lfo.last_out));
     // // then do a calc cycle coupled with a midi send cycle...
     // // two loops
     // // first loop goes through all the channels in order and gets output value / destination and accumulates it in variable for each channel

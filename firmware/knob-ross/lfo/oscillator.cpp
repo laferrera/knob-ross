@@ -11,6 +11,7 @@ float Oscillator::Process()
     float out, t;
     switch(waveform_)
     {
+        case NONE: out = 1.0f; break;
         case WAVE_SIN: out = sinf(phase_); break;
         case WAVE_TRI:
             t   = -1.0f + (2.0f * phase_ * TWO_PI_RECIP);

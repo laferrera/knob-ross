@@ -19,6 +19,7 @@ class Oscillator
     */
     enum
     {
+        NONE,
         WAVE_SIN,
         WAVE_TRI,
         WAVE_SAW,
