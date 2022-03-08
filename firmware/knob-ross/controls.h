@@ -43,14 +43,14 @@ Button buttonOkay = Button();
 //maybe lets call this a channel
 struct Channel {
   uint8_t index;
-  uint8_t outputValue; // 0 - 127 for midi
+  float outputValue; // -1 to 1
   long encoderValue; // -infinity to +infinity
   uint8_t cc; // 102 -128 ?
   int phase; // i think this is -π to +π
   bool lfoEnabled; // true | false 
   uint8_t lfoWave; // 0 - 6 for lfo wave
   float lfoAmp; // -1 to 1
-  float lfoAmpOffset; // -1 to 1 - this shifts the lfo output wave up
+  float lfoAmpOffset; // -1 to 1 - this shifts the lfo output wave up or down
   bool lfoFreqBPM; // true | false / either BPM or Hz
   float lfoFreq;   // hz .0005 - 50hz..... 33.333333333 minutes to 20ms
   int lfoFreqBeatType; // bar, 1/2, 1/4, 1/8, 1/16, 1/32, 1/64
@@ -59,7 +59,7 @@ struct Channel {
   uint8_t encoderDestination; // i.e. channel controls value / lfo amp / lfo freq / lfo offset / wave
   Channel *channelDestination;      // which channel does the lfo control? 
   uint8_t outputDestination;  // which param on channel above does the channel control? value / amp / freq / offset / wave
-  daisysp::Oscillator lfo;
+  daisysp::Oscillator *lfo;
   // lfo param? i.e. pulsewidth
 };
 
@@ -72,6 +72,8 @@ String lfoDestination[] = {"FREQ", "AMP", "PHASE", "OFFSET"};
 void initializeChannels(void){
   // initiaize channels, should probably do this for banks.
   for (int i = 0; i < NUM_OF_CHANNELS; i++) {
+    static daisysp::Oscillator *lfo = new daisysp::Oscillator;
+    lfo->Init(samplerate);
     Channel channel;
     channel.index = i;
     channel.outputValue = 0;
@@ -83,7 +85,7 @@ void initializeChannels(void){
     channel.lfoAmpOffset = 0;
     channel.channelDestination = &channel;
     *channels[i] = channel;
-    channel.lfo.Init(samplerate);
+    channel.lfo = lfo;
   }
 }
 
@@ -100,10 +102,9 @@ void initializeButtons(void){
 // lfo1Out = lfo1.Process(channels[i].lfoWave, channels[i].lfoAmp, channels[i].lfoFreq, channels[i].lfoFreqBeatType, channels[i].lfoFreqBeatAmount, channels[i].lfoFreqBeatOffset);
 void processLfos(void) {
   for (uint8_t i = 0; i < NUM_OF_CHANNELS; i++) {
-    if (channels[i]->lfoEnabled) {
-      channels[i]->lfo.Process();
-    }
+    channels[i]->outputValue = channels[i]->lfo->Process();
   }
+  Serial.println("LFO 0" + String(channels[0]->lfo->Process()));
 }
 
 #endif

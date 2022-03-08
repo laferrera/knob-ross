@@ -8,61 +8,72 @@ constexpr float TWO_PI_RECIP = 1.0f / TWOPI_F;
 
 float Oscillator::Process()
 {
-    float out, t;
-    switch(waveform_)
-    {
-        case NONE: out = 1.0f; break;
-        case WAVE_SIN: out = sinf(phase_); break;
-        case WAVE_TRI:
-            t   = -1.0f + (2.0f * phase_ * TWO_PI_RECIP);
-            out = 2.0f * (fabsf(t) - 0.5f);
-            break;
-        case WAVE_SAW:
-            out = -1.0f * (((phase_ * TWO_PI_RECIP * 2.0f)) - 1.0f);
-            break;
-        case WAVE_RAMP: out = ((phase_ * TWO_PI_RECIP * 2.0f)) - 1.0f; break;
-        case WAVE_SQUARE: out = phase_ < PI_F ? (1.0f) : -1.0f; break;
-        case WAVE_SMOOTH:
-          phase_ += freq_;
-          if (phase_ >= 1.0f) {
-            phase_ -= 1.0f;
-            last_out_ += interval_;
-            interval_ = rand() * kRandFrac * 2.0f - 1.0f - last_out_;
-          }
-          t = phase_ * phase_ * (3.0f - 2.0f * phase_);
-          out = last_out_ + interval_ * t; break;
-        case WAVE_RANDOM:
-          phase_ += freq_;
-          if (phase_ >= 1.0f) {
-            phase_ -= 1.0f;
-            last_out_ = rand() * kRandFrac * 2.0f - 1.0f;
-          }
-          t = phase_ * phase_ * (3.0f - 2.0f * phase_);
-          out = last_out_; break;
-        case WAVE_POLYBLEP_TRI:
-            t   = phase_ * TWO_PI_RECIP;
-            out = phase_ < PI_F ? 1.0f : -1.0f;
-            out += Polyblep(phase_inc_, t);
-            out -= Polyblep(phase_inc_, fmodf(t + 0.5f, 1.0f));
-            // Leaky Integrator:
-            // y[n] = A + x[n] + (1 - A) * y[n-1]
-            out       = phase_inc_ * out + (1.0f - phase_inc_) * last_out_;
-            last_out_ = out;
-            break;
-        case WAVE_POLYBLEP_SAW:
-            t   = phase_ * TWO_PI_RECIP;
-            out = (2.0f * t) - 1.0f;
-            out -= Polyblep(phase_inc_, t);
-            out *= -1.0f;
-            break;
-        case WAVE_POLYBLEP_SQUARE:
-            t   = phase_ * TWO_PI_RECIP;
-            out = phase_ < PI_F ? 1.0f : -1.0f;
-            out += Polyblep(phase_inc_, t);
-            out -= Polyblep(phase_inc_, fmodf(t + 0.5f, 1.0f));
-            out *= 0.707f; // ?
-            break;
-        default: out = 0.0f; break;
+  float out, t;
+  switch (waveform_) {
+  case NONE:
+    out = 1.0f;
+    break;
+  case WAVE_SIN:
+    out = sinf(phase_);
+    break;
+  case WAVE_TRI:
+    t = -1.0f + (2.0f * phase_ * TWO_PI_RECIP);
+    out = 2.0f * (fabsf(t) - 0.5f);
+    break;
+  case WAVE_SAW:
+    out = -1.0f * (((phase_ * TWO_PI_RECIP * 2.0f)) - 1.0f);
+    break;
+  case WAVE_RAMP:
+    out = ((phase_ * TWO_PI_RECIP * 2.0f)) - 1.0f;
+    break;
+  case WAVE_SQUARE:
+    out = phase_ < PI_F ? (1.0f) : -1.0f;
+    break;
+  case WAVE_SMOOTH:
+    phase_ += freq_;
+    if (phase_ >= 1.0f) {
+      phase_ -= 1.0f;
+      last_out_ += interval_;
+      interval_ = rand() * kRandFrac * 2.0f - 1.0f - last_out_;
+    }
+    t = phase_ * phase_ * (3.0f - 2.0f * phase_);
+    out = last_out_ + interval_ * t;
+    break;
+  case WAVE_RANDOM:
+    phase_ += freq_;
+    if (phase_ >= 1.0f) {
+      phase_ -= 1.0f;
+      last_out_ = rand() * kRandFrac * 2.0f - 1.0f;
+    }
+    t = phase_ * phase_ * (3.0f - 2.0f * phase_);
+    out = last_out_;
+    break;
+  case WAVE_POLYBLEP_TRI:
+    t = phase_ * TWO_PI_RECIP;
+    out = phase_ < PI_F ? 1.0f : -1.0f;
+    out += Polyblep(phase_inc_, t);
+    out -= Polyblep(phase_inc_, fmodf(t + 0.5f, 1.0f));
+    // Leaky Integrator:
+    // y[n] = A + x[n] + (1 - A) * y[n-1]
+    out = phase_inc_ * out + (1.0f - phase_inc_) * last_out_;
+    last_out_ = out;
+    break;
+  case WAVE_POLYBLEP_SAW:
+    t = phase_ * TWO_PI_RECIP;
+    out = (2.0f * t) - 1.0f;
+    out -= Polyblep(phase_inc_, t);
+    out *= -1.0f;
+    break;
+  case WAVE_POLYBLEP_SQUARE:
+    t = phase_ * TWO_PI_RECIP;
+    out = phase_ < PI_F ? 1.0f : -1.0f;
+    out += Polyblep(phase_inc_, t);
+    out -= Polyblep(phase_inc_, fmodf(t + 0.5f, 1.0f));
+    out *= 0.707f; // ?
+    break;
+  default:
+    out = 0.0f;
+    break;
     }
     phase_ += phase_inc_;
     if(phase_ > TWOPI_F)
