@@ -228,5 +228,30 @@ void loop() {
       if (ch == 'c') {
         menu.registerKeyPress(GEM_KEY_OK);
       }
+      if (ch == 'p') {
+        Serial.println("");
+        Serial.println("channel 0 lfoFreq: " + String(channels[0]->lfoFreq));
+        Serial.println("Channel 0 actual lfoFreq" + String(channels[0]->lfo->GetFreq()));
+        Serial.println("channel 0 last graph val: " + String(graphQueues[0].back()));
+        Serial.println("channel 1 lfoFreq: " + String(channels[1]->lfoFreq));
+        Serial.println("Channel 1 actual lfoFreq" + String(channels[1]->lfo->GetFreq()));
+        Serial.println("channel 1: last graph val" + String(graphQueues[1].back()));
+      }
+      if (ch == 'f') {
+        float freq = 10.0f;
+        channels[0]->lfo->SetFreq(freq);
+        Serial.println("Setting channel 0 lfo freq to: " + String(freq));
+        // Serial.println("Channel 0 lfo addres" + String(channels[0].lfo));
+        float freq2 = 20.0f;
+        channels[1]->lfo->SetFreq(freq);
+        Serial.println("Setting channel 1 lfo freq to: " + String(freq2));
+        // Serial.println("Channel 1 lfo addres" + String(channels[1]lfo));
+        
+      }
+      if (ch == 'g') {
+        float freq = 5.0f;
+        channels[0]->lfoFreq = freq;
+        dirtyChannel();
+      }
     }
   }

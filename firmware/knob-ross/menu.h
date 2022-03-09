@@ -112,25 +112,28 @@ void setupMainMenu() {
 
 void dirtyChannel() {
   // void dirtyChannel(u_int8_t channelIndex) {
-  Serial.println("Channel 1 Knob Dest" + String(channels[0]->encoderDestination));
-  Serial.println("Channel 1 Channel Dest" + String(channels[0]->channelDestinationIndex));
-  Serial.println("Channel 1 Output Dest" + String(channels[0]->outputDestination));
-  Serial.println("Channel 1 lfoAmp" + String(channels[0]->lfoAmp));
-  Serial.println("Channel 1 lfoFreq" + String(channels[0]->lfoFreq));
-  // Serial.println("Channel 1 actual lfoFreq" + String(channels[0]->lfoFreq));
-  Serial.println("Channel 1 lfoWave" + String(channels[0]->lfoWave));
-  Serial.println("Channel 1 midi cc" + String(channels[0]->cc));
+  // Serial.println("Channel 1 Knob Dest" + String(channels[0]->encoderDestination));
+  // Serial.println("Channel 1 Channel Dest" + String(channels[0]->channelDestinationIndex));
+  // Serial.println("Channel 1 Output Dest" + String(channels[0]->outputDestination));
+  // Serial.println("Channel 1 lfoAmp" + String(channels[0]->lfoAmp));
+  // Serial.println("Channel 1 lfoFreq" + String(channels[0]->lfoFreq));
+  // Serial.println("Channel 1 actual lfoFreq" + String(channels[0]->lfo->GetFreq()));
+  // Serial.println("Channel 1 lfoWave" + String(channels[0]->lfoWave));
+  // Serial.println("Channel 1 midi cc" + String(channels[0]->cc));
   // Serial.println("Channel 1 LFO Offset" + String(channels[0]->lfoOffset));
 
   
-  for (uint8_t i = 0; i < NUM_OF_CHANNELS; i++) {
-    channels[i]->channelDestination = channels[channels[i]->channelDestinationIndex];
-    // TODO if channel destination is self, set output destination to amp, 
-    // hide the channels outputDest menu
-    channels[i]->lfo->SetWaveform(channels[i]->lfoWave);
+  for (int i = 0; i < NUM_OF_CHANNELS; i++) {
+    // float _lfoFreq = 50.0f; // works...
+    // float _lfoFreq = channels[i]->lfoFreq;
+
+    channels[i]->lfo->SetFreq(channels[i]->lfoFreq;);
     channels[i]->lfo->SetAmp(channels[i]->lfoAmp);
-    channels[i]->lfo->SetFreq(channels[i]->lfoFreq);
-    
+    // channels[i]->lfo->SetWaveform(channels[i]->lfoWave);
+    // channels[i]->lfo->SetAmp(channels[i]->lfoAmp);
+    // channels[i]->channelDestination = channels[channels[i]->channelDestinationIndex];
+    // TODO if channel destination is self, set output destination to amp,
+    // hide the channels outputDest menu
   }
 }
 
@@ -152,7 +155,7 @@ void setupChannelMenu(Channel *channels[]){
     // GEMItem *channelDestination = new GEMItem("Channel Dest:", channels[i]->channelDestinationIndex, channelSelect, dirtyChannel);
     // GEMItem *outputDestination = new GEMItem("Output Dest:", channels[i]->outputDestination, outputDestinationSelect, dirtyChannel);
     // GEMItem *channelAmp = new GEMItem("Amp:", channels[i]->lfoAmp, negOneToOneSelect, dirtyChannel);
-    // GEMItem *channelFreq = new GEMItem("Freq:", channels[i]->lfoFreq, freqSelect, dirtyChannel);
+    GEMItem *channelFreq = new GEMItem("Freq:", channels[i]->lfoFreq, freqSelect, dirtyChannel);
     // GEMItem *channelWave = new GEMItem("Wave:", channels[i]->lfoWave, waveSelect, dirtyChannel);
     GEMItem *channelCC = new GEMItem("CC:", channels[i]->cc, midiCCSelect);
     GEMItem *channelPhase = new GEMItem("Phase:", channels[i]->phase, oneTwoEightSelect);
@@ -162,7 +165,7 @@ void setupChannelMenu(Channel *channels[]){
     // channelPage->addMenuItem(*channelDestination);
     // channelPage->addMenuItem(*outputDestination); 
     // channelPage->addMenuItem(*channelAmp);
-    // channelPage->addMenuItem(*channelFreq);
+    channelPage->addMenuItem(*channelFreq);
     // channelPage->addMenuItem(*channelWave);
 
     channelPage->addMenuItem(*channelPhase);

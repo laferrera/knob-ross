@@ -9,6 +9,8 @@
 #include "graph.h"
 
 float samplerate = 10000.0f;
+std::vector<daisysp::Oscillator> oscillators;
+
 int channelAccumulator[] = {0,0,0,0,0,0,0,0};
 int channelScaler[] = {0,0,0,0,0,0,0,0};
 int prevChannelAccumulator[] = {0,0,0,0,0,0,0,0};
@@ -82,7 +84,10 @@ void initializeChannels(void){
   // ec = AMP;
 
   for (int i = 0; i < NUM_OF_CHANNELS; i++) {
-    static daisysp::Oscillator *lfo = new daisysp::Oscillator;
+    // static daisysp::Oscillator *lfo = new daisysp::Oscillator;
+    daisysp::Oscillator *lfo = new daisysp::Oscillator;
+    oscillators.push_back(*lfo);
+    // Serial.printf("x lives at %p.\n", (void *)&lfo);
     lfo->Init(samplerate);
     Channel channel;
     channel.index = i;

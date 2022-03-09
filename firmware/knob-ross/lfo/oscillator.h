@@ -52,7 +52,7 @@ class Oscillator
         phase_     = 0.0f;
         phase_inc_ = CalcPhaseInc(freq_);
         waveform_  = WAVE_SIN;
-        interval_ = 0.0f; // for smooth random
+        interval_   = 0.0f; // for smooth random
         eoc_       = true;
         eor_       = true;
     }
@@ -65,7 +65,7 @@ class Oscillator
         freq_      = f;
         phase_inc_ = CalcPhaseInc(f);
     }
-
+    inline float GetFreq() { return freq_; }
 
     /** Sets the amplitude of the waveform.
     */
@@ -113,7 +113,7 @@ class Oscillator
     float   last_out_, last_freq_;
     bool    eor_, eoc_;
     static constexpr float kRandFrac = 1.f / (float)RAND_MAX; // for smooth random
-    float interval_; // for smooth random
+    float   interval_; // for smooth random
 };
 } // namespace daisysp
 #endif
