@@ -14,9 +14,10 @@ const char *channelStr = "CHANNEL";
     // list<GEMPage> pages;
     // list<GEMItem> items;
 
-std::vector<GEMPage>
-pages;
-std::vector<GEMItem> items;
+std::vector<GEMPage> pages;
+std::vector<GEMPage> channelPages;
+std::vector<std::vector <GEMItem>> channelPageItems;
+std::vector<std::vector<GEMItem>> channelPageLinks;
 // TODO make arrays or vectors for the different channelMenuItems 
 // std::vector<void (*)()> dirtyChannelFunctions;
 
@@ -127,7 +128,7 @@ void dirtyChannel() {
     // float _lfoFreq = 50.0f; // works...
     // float _lfoFreq = channels[i]->lfoFreq;
 
-    channels[i]->lfo->SetFreq(channels[i]->lfoFreq;);
+    channels[i]->lfo->SetFreq(channels[i]->lfoFreq);
     channels[i]->lfo->SetAmp(channels[i]->lfoAmp);
     // channels[i]->lfo->SetWaveform(channels[i]->lfoWave);
     // channels[i]->lfo->SetAmp(channels[i]->lfoAmp);
@@ -147,24 +148,29 @@ void setupChannelMenu(Channel *channels[]){
     // GEMPage *channelPage = new GEMPage(channelStr);
     // GEMItem *channelPageLink = new GEMItem(channelStr, channelPage);
 
-    //todo fix this
+    //todo fix this string issue....
+    std::vector<GEMItem> channelItemHolder;
     GEMPage *channelPage = new GEMPage(channelStr);
+    channelPages.push_back(*channelPage);
     GEMItem *channelPageLink = new GEMItem(channelStr, channelPage);
 
     // GEMItem *channelEncoderDestination = new GEMItem("Knob Dest:", channels[i]->encoderDestination, encoderSelect, dirtyChannel);
     // GEMItem *channelDestination = new GEMItem("Channel Dest:", channels[i]->channelDestinationIndex, channelSelect, dirtyChannel);
     // GEMItem *outputDestination = new GEMItem("Output Dest:", channels[i]->outputDestination, outputDestinationSelect, dirtyChannel);
-    // GEMItem *channelAmp = new GEMItem("Amp:", channels[i]->lfoAmp, negOneToOneSelect, dirtyChannel);
+    GEMItem *channelAmp = new GEMItem("Amp:", channels[i]->lfoAmp, negOneToOneSelect, dirtyChannel);
+    channelItemHolder.push_back(*channelAmp);
     GEMItem *channelFreq = new GEMItem("Freq:", channels[i]->lfoFreq, freqSelect, dirtyChannel);
+    channelItemHolder.push_back(*channelFreq);
     // GEMItem *channelWave = new GEMItem("Wave:", channels[i]->lfoWave, waveSelect, dirtyChannel);
     GEMItem *channelCC = new GEMItem("CC:", channels[i]->cc, midiCCSelect);
+    channelItemHolder.push_back(*channelCC);
     GEMItem *channelPhase = new GEMItem("Phase:", channels[i]->phase, oneTwoEightSelect);
-    
+    channelItemHolder.push_back(*channelPhase);
 
     // channelPage->addMenuItem(*channelEncoderDestination);
     // channelPage->addMenuItem(*channelDestination);
     // channelPage->addMenuItem(*outputDestination); 
-    // channelPage->addMenuItem(*channelAmp);
+    channelPage->addMenuItem(*channelAmp);
     channelPage->addMenuItem(*channelFreq);
     // channelPage->addMenuItem(*channelWave);
 
@@ -174,6 +180,7 @@ void setupChannelMenu(Channel *channels[]){
 
     channelsMenuPage.addMenuItem(*channelPageLink);
     channelPage->setParentMenuPage(channelsMenuPage);
+    channelPageItems.push_back(channelItemHolder);
   }
 }
 

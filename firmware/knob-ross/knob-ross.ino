@@ -18,6 +18,8 @@ elapsedMillis ellapsedEncoderTouchMillis;
 elapsedMillis ellapsedMetroMillis;
 elapsedMicros ellapsedLfoMicros;
 
+int curGraphIndex = 0;
+
 uint32_t screenStepTime = 6; // ~15fps
 uint32_t channelCalcStepTime = 7;
 // uint32_t midiSendStepTime = 13; 
@@ -61,6 +63,8 @@ void loop() {
   buttonCancel.update();
   buttonOkay.update();
 
+
+
   if (buttonCancel.pressed()) {
     // menu.registerKeyPress(GEM_KEY_CANCEL);
     // screenDirty = true;
@@ -92,7 +96,9 @@ void loop() {
           screenDirty = true;
         }
         controlChannelValue = newControlChannelValue;
-      }
+    } else if (curMode == PERFORMANCE) {
+      curGraphIndex = (curGraphIndex + 1) % NUM_OF_CHANNELS;
+    }
   }
 
   // for (int i = 0; i < SIZE_OF_CHANNELS; i++) {
@@ -129,7 +135,7 @@ void loop() {
 
   if (ellaspedChannelCalcMillis > channelCalcStepTime) {
     if (curMode == PERFORMANCE) {
-      drawGraph(0);
+      drawGraph(curGraphIndex);
     }
     // Serial.println("Channel 1 Output: " + String(channels[0]->outputValue));
     // // then do a calc cycle coupled with a midi send cycle...
@@ -230,12 +236,13 @@ void loop() {
       }
       if (ch == 'p') {
         Serial.println("");
-        Serial.println("channel 0 lfoFreq: " + String(channels[0]->lfoFreq));
-        Serial.println("Channel 0 actual lfoFreq" + String(channels[0]->lfo->GetFreq()));
-        Serial.println("channel 0 last graph val: " + String(graphQueues[0].back()));
-        Serial.println("channel 1 lfoFreq: " + String(channels[1]->lfoFreq));
-        Serial.println("Channel 1 actual lfoFreq" + String(channels[1]->lfo->GetFreq()));
-        Serial.println("channel 1: last graph val" + String(graphQueues[1].back()));
+        for(int i = 0; i < NUM_OF_CHANNELS; i++){
+          Serial.println("Channel :" + String(i));
+          Serial.println("lfoFreq: " + String(channels[i]->lfoFreq));
+          Serial.println("actual lfoFreq" + String(channels[i]->lfo->GetFreq()));
+          Serial.println("last graph val: " + String(graphQueues[i].back()));
+        }
+
       }
       if (ch == 'f') {
         float freq = 10.0f;

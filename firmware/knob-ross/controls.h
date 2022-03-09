@@ -87,7 +87,7 @@ void initializeChannels(void){
     // static daisysp::Oscillator *lfo = new daisysp::Oscillator;
     daisysp::Oscillator *lfo = new daisysp::Oscillator;
     oscillators.push_back(*lfo);
-    // Serial.printf("x lives at %p.\n", (void *)&lfo);
+    Serial.printf("x lives at %p.\n", (void *)lfo);
     lfo->Init(samplerate);
     Channel channel;
     channel.index = i;
@@ -97,7 +97,7 @@ void initializeChannels(void){
     channel.outputDestination = OUT_MIDI;
     channel.cc = 102 + i;
     channel.phase = 0;
-    channel.lfoFreq = 1.0f;
+    channel.lfoFreq = 1.0f * (i + 1);
     channel.lfoAmp = 0.5;
     channel.lfoWave = 0;
     channel.lfoAmpOffset = 0;
@@ -105,7 +105,8 @@ void initializeChannels(void){
     channel.channelDestination = &channel;
     channel.lfo = lfo;
     *channels[i] = channel;
-    
+
+    lfo->SetFreq(channel.lfoFreq);
   }
 }
 
