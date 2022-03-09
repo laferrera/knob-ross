@@ -105,12 +105,10 @@ void setupMainMenu() {
   globalMenuPage.setParentMenuPage(mainMenuPage);
   mainMenuPage.addMenuItem(channelsMenuLink);
   mainMenuPage.addMenuItem(performanceMenuItemButton);
-  mainMenuPage.addMenuItem(tempoMenuLink);
-  mainMenuPage.addMenuItem(learnMenuLink);
-  mainMenuPage.addMenuItem(globalMenuLink);
-  mainMenuPage.addMenuItem(twoHeadedMonsterMenuLink);
-  // mainMenuPage.addMenuItem(menuItemSelect);
-  // mainMenuPage.addMenuItem(menuItemInt);
+  // mainMenuPage.addMenuItem(tempoMenuLink);
+  // mainMenuPage.addMenuItem(learnMenuLink);
+  // mainMenuPage.addMenuItem(globalMenuLink);
+  // mainMenuPage.addMenuItem(twoHeadedMonsterMenuLink);
   menu.setMenuPageCurrent(mainMenuPage);
 }
 
@@ -134,9 +132,10 @@ void dirtyChannel() {
   Serial.println("Channel 1 Knob Dest" + String(channels[0]->encoderDestination));
   Serial.println("Channel 1 Channel Dest" + String(channels[0]->channelDestinationIndex));
   Serial.println("Channel 1 Output Dest" + String(channels[0]->outputDestination));
-  Serial.println("Channel 1 LFO Amp" + String(channels[0]->lfoAmp));
-  Serial.println("Channel 1 LFO Freq" + String(channels[0]->lfoFreq));
-  Serial.println("Channel 1 LFO Wave" + String(channels[0]->lfoWave));
+  Serial.println("Channel 1 lfoAmp" + String(channels[0]->lfoAmp));
+  Serial.println("Channel 1 lfoFreq" + String(channels[0]->lfoFreq));
+  // Serial.println("Channel 1 actual lfoFreq" + String(channels[0]->lfoFreq));
+  Serial.println("Channel 1 lfoWave" + String(channels[0]->lfoWave));
   // Serial.println("Channel 1 LFO Offset" + String(channels[0]->lfoOffset));
 
   
@@ -176,12 +175,12 @@ void setupChannelMenu(Channel *channels[]){
     GEMItem *channelPhase = new GEMItem("Phase:", channels[i]->phase, twoFiveSixSelect);
     GEMItem *channelCC = new GEMItem("CC:", channels[i]->cc, oneTwoEightSelect);
 
-    channelPage->addMenuItem(*channelEncoderDestination);
-    channelPage->addMenuItem(*channelDestination);
-    channelPage->addMenuItem(*outputDestination); 
-    channelPage->addMenuItem(*channelAmp);
-    channelPage->addMenuItem(*channelFreq);
-    channelPage->addMenuItem(*channelWave);
+    // channelPage->addMenuItem(*channelEncoderDestination);
+    // channelPage->addMenuItem(*channelDestination);
+    // channelPage->addMenuItem(*outputDestination); 
+    // channelPage->addMenuItem(*channelAmp);
+    // channelPage->addMenuItem(*channelFreq);
+    // channelPage->addMenuItem(*channelWave);
 
     channelPage->addMenuItem(*channelPhase);
     channelPage->addMenuItem(*channelCC);

@@ -60,18 +60,20 @@ void loop() {
 
   buttonCancel.update();
   buttonOkay.update();
+
   if (buttonCancel.pressed()) {
-    menu.registerKeyPress(GEM_KEY_CANCEL);
-    screenDirty = true;
-    // if (curMode == "PERFORMANCE"){
-    //   Serial.println("switching curMode to MAIN_MENU");
-    //   curMode = "MAIN_MENU";
-    //   menu.reInit();
-    //   menu.drawMenu();
-    // } else {
-    //   menu.registerKeyPress(GEM_KEY_CANCEL);
-    //   screenDirty = true;
-    // }
+    // menu.registerKeyPress(GEM_KEY_CANCEL);
+    // screenDirty = true;
+    if (curMode == PERFORMANCE){
+      Serial.println("switching curMode to MAIN_MENU");
+      curMode = MAIN_MENU;
+      display.clearDisplay();
+      menu.reInit();
+      menu.drawMenu();
+    } else {
+      menu.registerKeyPress(GEM_KEY_CANCEL);
+      screenDirty = true;
+    }
   }
   if (buttonOkay.pressed()) {
     screenDirty = true;
