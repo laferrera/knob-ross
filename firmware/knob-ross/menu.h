@@ -46,6 +46,7 @@ SelectOptionFloat freqArr[] = {{"0.001hz", 0.001f},{"0.002hz", 0.002f},{"0.005hz
 SelectOptionInt encoderDestinationsArr[] = {{"Amp", ENC_AMP}, {"Freq", ENC_FREQ}, {"Wave", ENC_WAVEFORM}, {"Offset", ENC_OFFSET}};
 SelectOptionInt channelDestinationsArr[] = {{"1", 0}, {"2", 1}, {"3", 2}, {"4", 3}, {"5", 4}, {"6", 5}, {"7", 6}, {"8", 7}, {"9", 8}, {"10", 9}, {"11", 10}, {"12", 11}, {"13", 12}, {"14", 13}, {"15", 14}, {"16", 15}};
 SelectOptionInt outputDestinationsArr[] = {{"MIDI", OUT_MIDI}, {"Amp", OUT_AMP}, {"Freq", OUT_FREQ}, {"Wave", OUT_WAVEFORM}, {"Offset", OUT_OFFSET}};
+SelectOptionInt midiCCArr[] = {{"102", 102}, {"103", 103}, {"104", 104}, {"105", 105}, {"106", 106}, {"107", 107}, {"108", 108}, {"109", 109}, {"110", 110}, {"111", 111}, {"112", 112}, {"113", 113}, {"114", 114}, {"115", 115}, {"116", 116}, {"117", 117}, {"118", 118}, {"119", 119}, {"120", 120}, {"121", 121}, {"122", 122}, {"123", 123}, {"124", 124}, {"125", 125}, {"126", 126}, {"127", 127}};
 SelectOptionInt testSelectArr[] = {{"0", 0}, {"1", 1}, {"2", 2}, {"3", 3}};
 // s="{"
 // i = -1.00
@@ -92,6 +93,7 @@ GEMSelect waveSelect(sizeof(lfoWaveArr) / sizeof(SelectOptionInt), lfoWaveArr);
 GEMSelect channelSelect(sizeof(channelDestinationsArr) / sizeof(SelectOptionInt), channelDestinationsArr);
 GEMSelect outputDestinationSelect(sizeof(outputDestinationsArr) / sizeof(SelectOptionInt), outputDestinationsArr);
 GEMSelect encoderSelect(sizeof(encoderDestinationsArr) / sizeof(SelectOptionInt), encoderDestinationsArr);
+GEMSelect midiCCSelect(sizeof(midiCCArr) / sizeof(SelectOptionInt), midiCCArr);
 GEMItem menuItemSelect("Number:", selectNumber, menuSelectTest);
 GEMItem menuItemInt("Int Number:", intNumber);
 GEMItem menuItemBool("Print?:", enableSerialPrint);
@@ -136,6 +138,7 @@ void dirtyChannel() {
   Serial.println("Channel 1 lfoFreq" + String(channels[0]->lfoFreq));
   // Serial.println("Channel 1 actual lfoFreq" + String(channels[0]->lfoFreq));
   Serial.println("Channel 1 lfoWave" + String(channels[0]->lfoWave));
+  Serial.println("Channel 1 midi cc" + String(channels[0]->cc));
   // Serial.println("Channel 1 LFO Offset" + String(channels[0]->lfoOffset));
 
   
@@ -164,16 +167,15 @@ void setupChannelMenu(Channel *channels[]){
     GEMPage *channelPage = new GEMPage(channelStr);
     GEMItem *channelPageLink = new GEMItem(channelStr, channelPage);
 
-    // GEMItem *channelValue = new GEMItem("Value:", channels[i]->outputValue, twoFiveSixSelect);
-    GEMItem *channelEncoderDestination = new GEMItem("Knob Dest:", channels[i]->encoderDestination, encoderSelect, dirtyChannel);
-    GEMItem *channelDestination = new GEMItem("Channel Dest:", channels[i]->channelDestinationIndex, channelSelect, dirtyChannel);
-    GEMItem *outputDestination = new GEMItem("Output Dest:", channels[i]->outputDestination, outputDestinationSelect, dirtyChannel);
-    GEMItem *channelAmp = new GEMItem("Amp:", channels[i]->lfoAmp, negOneToOneSelect, dirtyChannel);
-    GEMItem *channelFreq = new GEMItem("Freq:", channels[i]->lfoFreq, freqSelect, dirtyChannel);
-    GEMItem *channelWave = new GEMItem("Wave:", channels[i]->lfoWave, waveSelect, dirtyChannel);
-
+    // GEMItem *channelEncoderDestination = new GEMItem("Knob Dest:", channels[i]->encoderDestination, encoderSelect, dirtyChannel);
+    // GEMItem *channelDestination = new GEMItem("Channel Dest:", channels[i]->channelDestinationIndex, channelSelect, dirtyChannel);
+    // GEMItem *outputDestination = new GEMItem("Output Dest:", channels[i]->outputDestination, outputDestinationSelect, dirtyChannel);
+    // GEMItem *channelAmp = new GEMItem("Amp:", channels[i]->lfoAmp, negOneToOneSelect, dirtyChannel);
+    // GEMItem *channelFreq = new GEMItem("Freq:", channels[i]->lfoFreq, freqSelect, dirtyChannel);
+    // GEMItem *channelWave = new GEMItem("Wave:", channels[i]->lfoWave, waveSelect, dirtyChannel);
+    GEMItem *channelCC = new GEMItem("CC:", channels[i]->cc, midiCCSelect);
     GEMItem *channelPhase = new GEMItem("Phase:", channels[i]->phase, twoFiveSixSelect);
-    GEMItem *channelCC = new GEMItem("CC:", channels[i]->cc, oneTwoEightSelect);
+    
 
     // channelPage->addMenuItem(*channelEncoderDestination);
     // channelPage->addMenuItem(*channelDestination);
@@ -184,6 +186,7 @@ void setupChannelMenu(Channel *channels[]){
 
     channelPage->addMenuItem(*channelPhase);
     channelPage->addMenuItem(*channelCC);
+    
 
     channelsMenuPage.addMenuItem(*channelPageLink);
     channelPage->setParentMenuPage(channelsMenuPage);

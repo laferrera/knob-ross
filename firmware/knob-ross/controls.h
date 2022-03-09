@@ -48,7 +48,7 @@ struct Channel {
   uint8_t index;
   float outputValue;            // -1 to 1
   long encoderValue;            // -infinity to +infinity
-  uint8_t cc;                   // 102 -128 ?
+  int cc;                   // 102 -128 ?
   int phase;                    // i think this is -π to +π
   int lfoWave;              // 0 - 6 for lfo wave
   float lfoAmp;                 // -1 to 1

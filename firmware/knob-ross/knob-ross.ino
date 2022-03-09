@@ -119,9 +119,6 @@ void loop() {
     // Serial.println("updating display");
     ellapsedDisplayMillis = ellapsedDisplayMillis - screenStepTime;
     display.display();
-    if (curMode == PERFORMANCE) {
-      drawGraph(0);
-    }
   }
 
   // lfo cycle - do this at 10khz
@@ -131,6 +128,9 @@ void loop() {
   }
 
   if (ellaspedChannelCalcMillis > channelCalcStepTime) {
+    if (curMode == PERFORMANCE) {
+      drawGraph(0);
+    }
     // Serial.println("Channel 1 Output: " + String(channels[0]->outputValue));
     // // then do a calc cycle coupled with a midi send cycle...
     // // two loops
