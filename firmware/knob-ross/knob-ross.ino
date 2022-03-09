@@ -41,6 +41,7 @@ void setup() {
   startupScreen();
   initializeChannels();
   initializeButtons();
+  initializeGraphs();
 
   pinMode(LED, OUTPUT);
   digitalWrite(LED, ledState);

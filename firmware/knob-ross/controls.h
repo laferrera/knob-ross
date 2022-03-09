@@ -6,6 +6,7 @@
 #include <Bounce2.h>
 #include <Encoder.h>
 #include "lfo/oscillator.cpp"
+#include "graph.h"
 
 float samplerate = 10000.0f;
 int channelAccumulator[] = {0,0,0,0,0,0,0,0};
@@ -42,6 +43,7 @@ Button buttonOkay = Button();
 // String encoderDestinations[] = {"AMP", "FREQ", "WAVEFORM", "OFFSET"};
 enum encoderDestinations {ENC_AMP, ENC_FREQ, ENC_WAVEFORM, ENC_OFFSET};
 enum outputDestinations {OUT_MIDI, OUT_AMP, OUT_FREQ, OUT_WAVEFORM, OUT_OFFSET};
+enum clipMode {CLIP_HARD, CLIP_SCALE, CLIP_RECTIFY};
 struct Channel {
   uint8_t index;
   float outputValue;            // -1 to 1
@@ -65,8 +67,12 @@ struct Channel {
 };
 
 struct Channel channel1, channel2, channel3, channel4, channel5, channel6, channel7, channel8, channel9, channel10, channel11, channel12, channel13, channel14, channel15, channel16;
+float graphs[NUM_OF_CHANNELS][128];
+// std::queue<float> graphQueues[NUM_OF_CHANNELS][128]; 
+// std::array<std::queue<float>, NUM_OF_CHANNELS> graphQueues;
+// std::array<FixedQueue<float, SCREEN_WIDTH>, NUM_OF_CHANNELS> graphQueues;
 
-// TODO - make vector
+// TODO - make these into vector
 Encoder *encoders[17] = {&enc1, &enc2, &enc3, &enc4, &enc5, &enc6, &enc7, &enc8, &enc9, &enc10, &enc11, &enc12, &enc13, &enc14, &enc15, &enc16};
 Channel *channels[16] = {&channel1, &channel2, &channel3, &channel4, &channel5, &channel6, &channel7, &channel8, &channel9, &channel10, &channel11, &channel12, &channel13, &channel14, &channel15, &channel16};
 
@@ -112,6 +118,7 @@ void initializeButtons(void){
 void processLfos(void) {
   for (uint8_t i = 0; i < NUM_OF_CHANNELS; i++) {
     channels[i]->outputValue = channels[i]->lfo->Process();
+    graphQueues[i].push(channels[i]->outputValue);
   }
 }
 

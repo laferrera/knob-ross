@@ -14,6 +14,7 @@ String curMode = "MAIN_MENU";
 
 std::vector<GEMPage> pages;
 std::vector<GEMItem> items;
+// TODO make arrays or vectors for the different channelMenuItems 
 // std::vector<void (*)()> dirtyChannelFunctions;
 
 // void dirtyChannel(u_int8_t index);
@@ -138,9 +139,12 @@ void dirtyChannel() {
   
   for (uint8_t i = 0; i < NUM_OF_CHANNELS; i++) {
     channels[i]->channelDestination = channels[channels[i]->channelDestinationIndex];
+    // TODO if channel destination is self, set output destination to amp, 
+    // hide the channels outputDest menu
     channels[i]->lfo->SetWaveform(channels[i]->lfoWave);
     channels[i]->lfo->SetAmp(channels[i]->lfoAmp);
     channels[i]->lfo->SetFreq(channels[i]->lfoFreq);
+    
   }
 }
 
