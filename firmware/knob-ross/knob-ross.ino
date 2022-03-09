@@ -116,6 +116,7 @@ void loop() {
   }
 
   if (ellaspedChannelCalcMillis > channelCalcStepTime) {
+    // Serial.println("Channel 1 Output: " + String(channels[0]->outputValue));
     // // then do a calc cycle coupled with a midi send cycle...
     // // two loops
     // // first loop goes through all the channels in order and gets output value / destination and accumulates it in variable for each channel

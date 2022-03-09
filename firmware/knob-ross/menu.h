@@ -126,9 +126,14 @@ void setupMainMenu() {
 //   dirtyChannelFunctions.push_back(dirtyChannel8);
 // }
 
-// void dirtyChannel(u_int8_t channelIndex) {
-//   Serial.println("Dirty channel" + String(channelIndex));
-// }
+void dirtyChannel() {
+  // void dirtyChannel(u_int8_t channelIndex) {
+  for (uint8_t i = 0; i < NUM_OF_CHANNELS; i++) {
+    channels[i]->lfo->SetWaveform(channels[i]->lfoWave);
+    channels[i]->lfo->SetAmp(channels[i]->lfoAmp);
+    channels[i]->lfo->SetFreq(channels[i]->lfoFreq);
+  }
+}
 
 void setupChannelMenu(Channel *channels[]){
   for (int i = 0; i < NUM_OF_CHANNELS; i++) {
@@ -140,12 +145,12 @@ void setupChannelMenu(Channel *channels[]){
     GEMPage *channelPage = new GEMPage(channelStr);
     GEMItem *channelPageLink = new GEMItem(channelStr, channelPage);
     // GEMItem *channelValue = new GEMItem("Value:", channels[i]->outputValue, twoFiveSixSelect);
-    GEMItem *channelEncoderDestination = new GEMItem("Knob Dest:", channels[i]->encoderDestination, encoderDestinationsSelect);
-    GEMItem *channelDestination = new GEMItem("Channel Dest:", channels[i]->channelDestinationIndex, channelSelect);
-    GEMItem *outputDestination = new GEMItem("Output Dest:", channels[i]->outputDestination, outputDestinationSelect); 
-    GEMItem *channelAmp = new GEMItem("Amp:", channels[i]->lfoAmp, negOneToOneSelect, setLfoAmp);
-    GEMItem *channelFreq = new GEMItem("Freq:", channels[i]->lfoFreq, freqSelect, setLfoFreq);
-    GEMItem *channelWave = new GEMItem("Wave:", channels[i]->lfoWave, waveSelect, setLfoWave);
+    GEMItem *channelEncoderDestination = new GEMItem("Knob Dest:", channels[i]->encoderDestination, encoderDestinationsSelect, dirtyChannel);
+    GEMItem *channelDestination = new GEMItem("Channel Dest:", channels[i]->channelDestinationIndex, channelSelect, dirtyChannel);
+    GEMItem *outputDestination = new GEMItem("Output Dest:", channels[i]->outputDestination, outputDestinationSelect, dirtyChannel);
+    GEMItem *channelAmp = new GEMItem("Amp:", channels[i]->lfoAmp, negOneToOneSelect, dirtyChannel);
+    GEMItem *channelFreq = new GEMItem("Freq:", channels[i]->lfoFreq, freqSelect, dirtyChannel);
+    GEMItem *channelWave = new GEMItem("Wave:", channels[i]->lfoWave, waveSelect, dirtyChannel);
 
     GEMItem *channelPhase = new GEMItem("Phase:", channels[i]->phase, twoFiveSixSelect);
     GEMItem *channelCC = new GEMItem("CC:", channels[i]->cc, oneTwoEightSelect);
@@ -165,27 +170,6 @@ void setupChannelMenu(Channel *channels[]){
   }
 }
 
-
-
-void setLfoAmp(){
-  // loop through channels and set all their amps
-  for (uint8_t i = 0; i < NUM_OF_CHANNELS; i++) {
-    channels[i]->lfo->SetAmp(channels[i]->lfoAmp);
-  }
-}
-
-void setLfoFreq() {
-  // loop through channels and set all their freq
-  for (uint8_t i = 0; i < NUM_OF_CHANNELS; i++) {
-    channels[i]->lfo->SetFreq(channels[i]->lfoFreq);
-  }
-}
-void setLfoWave() {
-  // loop through channels and set all their wave
-  for (uint8_t i = 0; i < NUM_OF_CHANNELS; i++) {
-    channels[i]->lfo->SetWaveform(channels[i]->lfoWave);
-  }
-}
 
 void printData() {
   // If enablePrint flag is set to true (checkbox on screen is checked)...

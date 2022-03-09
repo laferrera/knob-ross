@@ -85,7 +85,7 @@ void initializeChannels(void){
     channel.encoderDestination = ENC_AMP;
     channel.cc = 102 + i;
     channel.phase = 0;
-    channel.lfoFreq = 100.0f;
+    channel.lfoFreq = 1.0f;
     channel.lfoAmp = 0.5;
     channel.lfoWave = 0;
     channel.lfoAmpOffset = 0;

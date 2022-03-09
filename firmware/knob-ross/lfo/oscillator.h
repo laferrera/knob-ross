@@ -47,7 +47,7 @@ class Oscillator
     {
         sr_        = sample_rate;
         sr_recip_  = 1.0f / sample_rate;
-        freq_      = 100.0f;
+        freq_      = 1.0f;
         amp_       = 0.5f;
         phase_     = 0.0f;
         phase_inc_ = CalcPhaseInc(freq_);
