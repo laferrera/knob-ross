@@ -40,7 +40,7 @@ SelectOptionFloat negOneToOneArr[] = {{"-1.00",-1.00},{"-0.99",-0.99},{"-0.98",-
 SelectOptionFloat oneTwoEightDecimalArr[] = {{"0", -1.00}, {"1", -0.98}, {"2", -0.97}, {"3", -0.95}, {"4", -0.94}, {"5", -0.92}, {"6", -0.91}, {"7", -0.89}, {"8", -0.87}, {"9", -0.86}, {"10", -0.84}, {"11", -0.83}, {"12", -0.81}, {"13", -0.80}, {"14", -0.78}, {"15", -0.76}, {"16", -0.75}, {"17", -0.73}, {"18", -0.72}, {"19", -0.70}, {"20", -0.69}, {"21", -0.67}, {"22", -0.65}, {"23", -0.64}, {"24", -0.62}, {"25", -0.61}, {"26", -0.59}, {"27", -0.57}, {"28", -0.56}, {"29", -0.54}, {"30", -0.53}, {"31", -0.51}, {"32", -0.50}, {"33", -0.48}, {"34", -0.46}, {"35", -0.45}, {"36", -0.43}, {"37", -0.42}, {"38", -0.40}, {"39", -0.39}, {"40", -0.37}, {"41", -0.35}, {"42", -0.34}, {"43", -0.32}, {"44", -0.31}, {"45", -0.29}, {"46", -0.28}, {"47", -0.26}, {"48", -0.24}, {"49", -0.23}, {"50", -0.21}, {"51", -0.20}, {"52", -0.18}, {"53", -0.17}, {"54", -0.15}, {"55", -0.13}, {"56", -0.12}, {"57", -0.10}, {"58", -0.09}, {"59", -0.07}, {"60", -0.06}, {"61", -0.04}, {"62", -0.02}, {"63", -0.01}, {"64", 0.01}, {"65", 0.02}, {"66", 0.04}, {"67", 0.06}, {"68", 0.07}, {"69", 0.09}, {"70", 0.10}, {"71", 0.12}, {"72", 0.13}, {"73", 0.15}, {"74", 0.17}, {"75", 0.18}, {"76", 0.20}, {"77", 0.21}, {"78", 0.23}, {"79", 0.24}, {"80", 0.26}, {"81", 0.28}, {"82", 0.29}, {"83", 0.31}, {"84", 0.32}, {"85", 0.34}, {"86", 0.35}, {"87", 0.37}, {"88", 0.39}, {"89", 0.40}, {"90", 0.42}, {"91", 0.43}, {"92", 0.45}, {"93", 0.46}, {"94", 0.48}, {"95", 0.50}, {"96", 0.51}, {"97", 0.53}, {"98", 0.54}, {"99", 0.56}, {"100", 0.57}, {"101", 0.59}, {"102", 0.61}, {"103", 0.62}, {"104", 0.64}, {"105", 0.65}, {"106", 0.67}, {"107", 0.69}, {"108", 0.70}, {"109", 0.72}, {"110", 0.73}, {"111", 0.75}, {"112", 0.76}, {"113", 0.78}, {"114", 0.80}, {"115", 0.81}, {"116", 0.83}, {"117", 0.84}, {"118", 0.86}, {"119", 0.87}, {"120", 0.89}, {"121", 0.91}, {"122", 0.92}, {"123", 0.94}, {"124", 0.95}, {"125", 0.97}, {"126", 0.98}, {"127", 1.00}};
 SelectOptionFloat freqArr[] = {{"0.001hz", 0.001f},{"0.002hz", 0.002f},{"0.005hz", 0.005f},{"0.01hz", 0.01f},{"0.02hz", 0.02f},{"0.05hz", 0.05f},{"0.1hz", 0.1f},{"0.2hz", 0.2f},{"0.5hz", 0.5f},{"1hz", 1.0f},{"2hz", 2.0f},{"5hz", 5.0f},{"10hz", 10.0f},{"20hz", 20.0f},{"50hz", 50.0f}};
 SelectOptionInt encoderDestinationsArr[] = {{"Amp", ENC_AMP}, {"Freq", ENC_FREQ}, {"Wave", ENC_WAVEFORM}, {"Offset", ENC_OFFSET}};
-SelectOptionInt channelDestinationsArr[] = {{"1",1}, {"2", 2}, {"3", 3}, {"4", 4}, {"5", 5}};
+SelectOptionInt channelDestinationsArr[] = {{"1",1}, {"2", 2}, {"3", 3}, {"4", 4}, {"5", 5}, {"6", 6}, {"7", 7}, {"8", 8}, {"9", 9}, {"10", 10}, {"11", 11}, {"12", 12}, {"13", 13}, {"14", 14}, {"15", 15}, {"16", 16}};
 SelectOptionInt outputDestinationsArr[] = {{"MIDI", OUT_MIDI}, {"Amp", OUT_AMP}, {"Freq", OUT_FREQ}, {"Wave", OUT_WAVEFORM}, {"Offset", OUT_OFFSET}};
 SelectOptionInt testSelectArr[] = {{"0", 0}, {"1", 1}, {"2", 2}, {"3", 3}};
 // s="{"
@@ -84,7 +84,6 @@ GEMSelect twoFiveSixSelect(sizeof(twoFiveSixArr) / sizeof(SelectOptionInt), twoF
 GEMSelect oneTwoEightSelect(sizeof(oneTwoEightArr) / sizeof(SelectOptionInt), oneTwoEightArr);
 GEMSelect negOneToOneSelect(sizeof(negOneToOneArr) / sizeof(SelectOptionInt), negOneToOneArr);
 GEMSelect freqSelect(sizeof(freqArr) / sizeof(SelectOptionFloat), freqArr);
-GEMSelect encoderDestinationsSelect(sizeof(encoderDestinationsArr) / sizeof(SelectOptionInt), encoderDestinationsArr);
 GEMSelect waveSelect(sizeof(lfoWaveArr) / sizeof(SelectOptionInt), lfoWaveArr);
 GEMSelect channelSelect(sizeof(channelDestinationsArr) / sizeof(SelectOptionInt), channelDestinationsArr);
 GEMSelect outputDestinationSelect(sizeof(outputDestinationsArr) / sizeof(SelectOptionInt), outputDestinationsArr);
@@ -127,7 +126,8 @@ void setupMainMenu() {
 // }
 
 void dirtyChannel() {
-  // void dirtyChannel(u_int8_t channelIndex) {
+  Serial.println("Channel 1 encoder destination" + String(channels[0]->encoderDestination));
+      // void dirtyChannel(u_int8_t channelIndex) {
   for (uint8_t i = 0; i < NUM_OF_CHANNELS; i++) {
     channels[i]->lfo->SetWaveform(channels[i]->lfoWave);
     channels[i]->lfo->SetAmp(channels[i]->lfoAmp);
@@ -145,7 +145,7 @@ void setupChannelMenu(Channel *channels[]){
     GEMPage *channelPage = new GEMPage(channelStr);
     GEMItem *channelPageLink = new GEMItem(channelStr, channelPage);
     // GEMItem *channelValue = new GEMItem("Value:", channels[i]->outputValue, twoFiveSixSelect);
-    GEMItem *channelEncoderDestination = new GEMItem("Knob Dest:", channels[i]->encoderDestination, encoderDestinationsSelect, dirtyChannel);
+    GEMItem *channelEncoderDestination = new GEMItem("Knob Dest:", channels[i]->encoderDestination, encoderSelect, dirtyChannel);
     GEMItem *channelDestination = new GEMItem("Channel Dest:", channels[i]->channelDestinationIndex, channelSelect, dirtyChannel);
     GEMItem *outputDestination = new GEMItem("Output Dest:", channels[i]->outputDestination, outputDestinationSelect, dirtyChannel);
     GEMItem *channelAmp = new GEMItem("Amp:", channels[i]->lfoAmp, negOneToOneSelect, dirtyChannel);
@@ -155,9 +155,9 @@ void setupChannelMenu(Channel *channels[]){
     GEMItem *channelPhase = new GEMItem("Phase:", channels[i]->phase, twoFiveSixSelect);
     GEMItem *channelCC = new GEMItem("CC:", channels[i]->cc, oneTwoEightSelect);
 
-    // channelPage->addMenuItem(*channelEncoderDestination);
-    // channelPage->addMenuItem(*channelDestination);
-    // channelPage->addMenuItem(*outputDestination); 
+    channelPage->addMenuItem(*channelEncoderDestination);
+    channelPage->addMenuItem(*channelDestination);
+    channelPage->addMenuItem(*outputDestination); 
     channelPage->addMenuItem(*channelAmp);
     channelPage->addMenuItem(*channelFreq);
     channelPage->addMenuItem(*channelWave);

@@ -48,7 +48,7 @@ struct Channel {
   long encoderValue;            // -infinity to +infinity
   uint8_t cc;                   // 102 -128 ?
   int phase;                    // i think this is -π to +π
-  uint8_t lfoWave;              // 0 - 6 for lfo wave
+  int lfoWave;              // 0 - 6 for lfo wave
   float lfoAmp;                 // -1 to 1
   float lfoAmpOffset;           // -1 to 1 - this shifts the lfo output wave up or down
   bool lfoFreqBPM;              // true | false / either BPM or Hz
@@ -56,8 +56,8 @@ struct Channel {
   int lfoFreqBeatType;          // bar, 1/2, 1/4, 1/8, 1/16, 1/32, 1/64
   uint8_t lfoFreqBeatAmount;    // 1-32 beats
   int lfoFreqBeatOffset;        // 1/64 - 1/32 - 1/16 - 1/8 - 1/4 - 1/2 - look at this how Reason does this...
-  uint8_t encoderDestination;   // i.e. channel controls value / lfo amp / lfo freq / lfo offset / wave
-  uint8_t channelDestinationIndex; // which channel id does the lfo control?
+  int encoderDestination;   // i.e. channel controls value / lfo amp / lfo freq / lfo offset / wave
+  int channelDestinationIndex; // which channel id does the lfo control?
   Channel * channelDestination; // which channel does the lfo control?
   uint8_t outputDestination;    // which param on channel above does the channel control? value / amp / freq / offset / wave
   daisysp::Oscillator * lfo;
@@ -83,13 +83,14 @@ void initializeChannels(void){
     channel.outputValue = 0;
     channel.encoderValue = 0;
     channel.encoderDestination = ENC_AMP;
+    channel.outputDestination = OUT_MIDI;
     channel.cc = 102 + i;
     channel.phase = 0;
     channel.lfoFreq = 1.0f;
     channel.lfoAmp = 0.5;
     channel.lfoWave = 0;
     channel.lfoAmpOffset = 0;
-    channel.channelDestinationIndex = i;
+    channel.channelDestinationIndex = i + 1;
     channel.channelDestination = &channel;
     channel.lfo = lfo;
     *channels[i] = channel;
