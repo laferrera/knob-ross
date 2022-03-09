@@ -90,7 +90,7 @@ void initializeChannels(void){
     channel.lfoAmp = 0.5;
     channel.lfoWave = 0;
     channel.lfoAmpOffset = 0;
-    channel.channelDestinationIndex = i + 1;
+    channel.channelDestinationIndex = i;
     channel.channelDestination = &channel;
     channel.lfo = lfo;
     *channels[i] = channel;
