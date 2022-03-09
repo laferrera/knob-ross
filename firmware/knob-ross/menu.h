@@ -6,13 +6,16 @@
 #include <vector>
 #include <string>
 
-String modes[] = {"MAIN_MENU", "PERFORMANCE", "CHANNEL", "TEMPO", "LEARN", "GLOBAL", "TWO_HEADED_MONSTER"};
-String curMode = "MAIN_MENU";
+enum modes { MAIN_MENU, PERFORMANCE, CHANNEL, TEMPO, LEARN, GLOBAL, TWO_HEADED_MONSTER}
+curMode = MAIN_MENU;
 
-// list<GEMPage> pages;
-// list<GEMItem> items;
+const char *channelStr = "CHANNEL";
 
-std::vector<GEMPage> pages;
+    // list<GEMPage> pages;
+    // list<GEMItem> items;
+
+std::vector<GEMPage>
+pages;
 std::vector<GEMItem> items;
 // TODO make arrays or vectors for the different channelMenuItems 
 // std::vector<void (*)()> dirtyChannelFunctions;
@@ -152,11 +155,16 @@ void setupChannelMenu(Channel *channels[]){
   for (int i = 0; i < NUM_OF_CHANNELS; i++) {
 
 
-    String channelName = "Channel " + String(i);
-    const char *channelStr = channelName.c_str();
-    // char *channelStr = channelName.c_str();
+    // String channelName = "Channel " + String(i);
+    // const char *channelStr = channelName.c_str();
+    // // char *channelStr = channelName.c_str();
+    // GEMPage *channelPage = new GEMPage(channelStr);
+    // GEMItem *channelPageLink = new GEMItem(channelStr, channelPage);
+
+    //todo fix this
     GEMPage *channelPage = new GEMPage(channelStr);
     GEMItem *channelPageLink = new GEMItem(channelStr, channelPage);
+
     // GEMItem *channelValue = new GEMItem("Value:", channels[i]->outputValue, twoFiveSixSelect);
     GEMItem *channelEncoderDestination = new GEMItem("Knob Dest:", channels[i]->encoderDestination, encoderSelect, dirtyChannel);
     GEMItem *channelDestination = new GEMItem("Channel Dest:", channels[i]->channelDestinationIndex, channelSelect, dirtyChannel);
@@ -197,7 +205,7 @@ void printData() {
 
 void setModeToPerformance(){
   Serial.println("Setting mode to performance");
-  curMode = "PERFORMANCE";
+  curMode = PERFORMANCE;
   menu.clearContext();
   // menu.context.exit();
 }

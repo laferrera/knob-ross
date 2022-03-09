@@ -61,8 +61,17 @@ void loop() {
   buttonCancel.update();
   buttonOkay.update();
   if (buttonCancel.pressed()) {
-    Serial.println("canceled");
+    menu.registerKeyPress(GEM_KEY_CANCEL);
     screenDirty = true;
+    // if (curMode == "PERFORMANCE"){
+    //   Serial.println("switching curMode to MAIN_MENU");
+    //   curMode = "MAIN_MENU";
+    //   menu.reInit();
+    //   menu.drawMenu();
+    // } else {
+    //   menu.registerKeyPress(GEM_KEY_CANCEL);
+    //   screenDirty = true;
+    // }
   }
   if (buttonOkay.pressed()) {
     screenDirty = true;
@@ -72,7 +81,7 @@ void loop() {
   long newControlChannelValue = controlChannel.read();
   if ((newControlChannelValue != controlChannelValue) && (abs(newControlChannelValue - controlChannelValue) > 4)) {
   // if (newControlChannelValue != controlChannelValue) {
-    if (curMode != "PERFORMANCE") {
+    if (curMode != PERFORMANCE) {
         if (newControlChannelValue > controlChannelValue) {
           menu.registerKeyPress(GEM_KEY_DOWN);
           screenDirty = true;
@@ -108,6 +117,9 @@ void loop() {
     // Serial.println("updating display");
     ellapsedDisplayMillis = ellapsedDisplayMillis - screenStepTime;
     display.display();
+    if (curMode == PERFORMANCE) {
+      drawGraph(0);
+    }
   }
 
   // lfo cycle - do this at 10khz
@@ -171,25 +183,26 @@ void loop() {
     //   Serial.println("screensaver on ");
     // }
 
-    if (curMode == "MAIN_MENU") {
+    if (curMode == MAIN_MENU) {
       //    menu.drawMenu();
 
-    } else if (curMode == "PERFORMANCE") {
-      int i = 0;
-      String channeltext = "channel " + String(i + 1) + ": " + String(channels[i]->encoderValue);
-      drawText(channeltext, 1);
-      String controlChannelText = "control channel :" + String(controlChannelValue);
-      drawText(controlChannelText, 3);
+    } else if (curMode == PERFORMANCE) {
+      // drawing graph for channel 0
+      
 
-    } else if (curMode == "KNOB") {
+    } else if (curMode == CHANNEL) {
       // channelMenu.drawMenu();
       // screenDirty = true;
-    } else if (curMode == "TEMPO") {
+    } else if (curMode == TEMPO) {
       // tempoMenu.drawMenu();
       // screenDirty = true;
     }
 
     if (Serial.available()) {
+      if (CrashReport){
+        Serial.print(CrashReport);
+      }
+
       char ch = Serial.read();
       Serial.print(ch);
       if (ch) {
