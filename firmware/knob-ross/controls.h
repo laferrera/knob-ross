@@ -11,9 +11,9 @@
 float samplerate = 10000.0f;
 std::vector<daisysp::Oscillator> oscillators;
 
-int channelAccumulator[] = {0,0,0,0,0,0,0,0};
+float channelAccumulator[] = {0,0,0,0,0,0,0,0};
 int channelScaler[] = {0,0,0,0,0,0,0,0};
-int prevChannelAccumulator[] = {0,0,0,0,0,0,0,0};
+float prevChannelAccumulator[] = {0,0,0,0,0,0,0,0};
 
 bool channelsDirty = false;
 // Encoder enc1(0, 1);
@@ -44,14 +44,15 @@ Button buttonOkay = Button();
 
 // String encoderDestinations[] = {"AMP", "FREQ", "WAVEFORM", "OFFSET"};
 enum encoderDestinations {ENC_AMP, ENC_FREQ, ENC_WAVEFORM, ENC_OFFSET};
-enum outputDestinations {OUT_MIDI, OUT_AMP, OUT_FREQ, OUT_WAVEFORM, OUT_OFFSET};
-enum clipMode {CLIP_HARD, CLIP_SCALE, CLIP_RECTIFY};
+enum outputDestinations {OUT_ADD, OUT_AMP, OUT_FREQ, OUT_WAVEFORM, OUT_OFFSET, OUT_MIDI};
+enum clipMode {CLIP_HARD, CLIP_SCALE, CLIP_BOUNCE, CLIP_RECTIFY};
 struct Channel {
   uint8_t index;
   float outputValue;            // -1 to 1
   long encoderValue;            // -infinity to +infinity
   int cc;                   // 102 -128 ?
   int phase;                    // i think this is -π to +π
+  int clipMode;                    
   int lfoWave;              // 0 - 6 for lfo wave
   float lfoAmp;                 // -1 to 1
   float lfoAmpOffset;           // -1 to 1 - this shifts the lfo output wave up or down
@@ -64,7 +65,7 @@ struct Channel {
   int channelDestinationIndex; // which channel id does the lfo control?
   Channel * channelDestination; // which channel does the lfo control?
   uint8_t outputDestination;    // which param on channel above does the channel control? value / amp / freq / offset / wave
-  daisysp::Oscillator * lfo;
+  daisysp::Oscillator *lfo;
   // lfo param? i.e. pulsewidth
 };
 
@@ -87,7 +88,7 @@ void initializeChannels(void){
     // static daisysp::Oscillator *lfo = new daisysp::Oscillator;
     daisysp::Oscillator *lfo = new daisysp::Oscillator;
     oscillators.push_back(*lfo);
-    Serial.printf("x lives at %p.\n", (void *)lfo);
+    // Serial.printf("Pointer lives at %p.\n", (void *)lfo);
     lfo->Init(samplerate);
     Channel channel;
     channel.index = i;
@@ -97,9 +98,10 @@ void initializeChannels(void){
     channel.outputDestination = OUT_MIDI;
     channel.cc = 102 + i;
     channel.phase = 0;
-    channel.lfoFreq = 1.0f * (i + 1);
-    channel.lfoAmp = 0.5;
-    channel.lfoWave = 0;
+    channel.clipMode = CLIP_HARD;
+    channel.lfoFreq = 2.0f * (i * 20 + 5);
+    channel.lfoAmp = 0.1f + (i * 0.1f);
+    channel.lfoWave = i % 7;
     channel.lfoAmpOffset = 0;
     channel.channelDestinationIndex = i;
     channel.channelDestination = &channel;
@@ -107,6 +109,7 @@ void initializeChannels(void){
     *channels[i] = channel;
 
     lfo->SetFreq(channel.lfoFreq);
+    lfo->SetWaveform(channel.lfoWave);
   }
 }
 
@@ -123,9 +126,75 @@ void initializeButtons(void){
 // lfo1Out = lfo1.Process(channels[i].lfoWave, channels[i].lfoAmp, channels[i].lfoFreq, channels[i].lfoFreqBeatType, channels[i].lfoFreqBeatAmount, channels[i].lfoFreqBeatOffset);
 void processLfos(void) {
   for (uint8_t i = 0; i < NUM_OF_CHANNELS; i++) {
-    channels[i]->outputValue = channels[i]->lfo->Process();
+    // channels[i]->outputValue = channels[i]->lfo->Process();
+    // graphQueues[i].push(channels[i]->outputValue);
+
+    float lfoOutput = channels[i]->lfo->Process();
+    if (channels[i]->channelDestinationIndex == i) {
+      channels[i]->outputValue = lfoOutput;
+      // graphQueues[i].push(channels[i]->outputValue);
+      channelAccumulator[i] += lfoOutput;
+      channelScaler[i] += 1;
+    } else {
+      int channelDestinationIndex = channels[i]->channelDestinationIndex;
+      switch (channels[i]->outputDestination) {
+        case OUT_ADD:
+          channelAccumulator[channelDestinationIndex] += lfoOutput;
+          channelScaler[channelDestinationIndex] += 1;
+          break;
+        case OUT_AMP:
+          channels[channelDestinationIndex]->lfoAmp = lfoOutput;
+          // channels[channelDestinationIndex]->lfo->SetAmp(channels[channelDestinationIndex]->lfoAmp);
+          break;
+        case OUT_FREQ:{
+          float newfreq = (1.0f + lfoOutput) * channels[channelDestinationIndex]->lfoFreq;
+          channels[channelDestinationIndex]->lfo->SetFreq(newfreq);
+          break;
+          }
+        case OUT_WAVEFORM:
+          channels[channelDestinationIndex]->lfoWave = (int)(lfoOutput * 10) % 7;
+          // channels[channelDestinationIndex]->lfo->SetWaveform(channels[channelDestinationIndex]->lfoWave);
+          break;
+        case OUT_OFFSET:
+          channels[channelDestinationIndex]->lfoAmpOffset = lfoOutput;
+          break;
+        default:
+          // default is OUT_ADD
+          channelAccumulator[channelDestinationIndex] += lfoOutput;
+          channelScaler[channelDestinationIndex] += 1;
+          break;
+      }
+    }
+  }
+  for (uint8_t i = 0; i < NUM_OF_CHANNELS; i++) {
+    switch (channels[i]->clipMode){
+      case CLIP_HARD:
+        channelAccumulator[i] = fclamp(channelAccumulator[i], -1.0f, 1.0f);
+        break;
+      case CLIP_SCALE:
+        channelAccumulator[i] *= 1.0f / channelScaler[i];
+        channelAccumulator[i] = fclamp(channelAccumulator[i], -1.0f, 1.0f);
+        break;
+      case CLIP_BOUNCE:
+        while (fabs(channelAccumulator[i] > 1.0f)) {
+          if (channelAccumulator[i] > 1.0f) {
+            channelAccumulator[i] = 2.0f - channelAccumulator[i];
+          } else if (channelAccumulator[i] < -1.0f) {
+            
+            channelAccumulator[i] = -2.0f - channelAccumulator[i];
+          }
+        }
+        break;
+      default:
+        // default is CLIP_HARD
+        channelAccumulator[i] = fclamp(channelAccumulator[i], -1.0f, 1.0f);
+        break;
+    }
+    channels[i]->outputValue = channelAccumulator[i];
     graphQueues[i].push(channels[i]->outputValue);
   }
+  memset(channelAccumulator, 0, sizeof(channelAccumulator));
+  memset(channelScaler, 0, sizeof(channelScaler));
 }
 
 #endif

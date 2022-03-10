@@ -52,7 +52,8 @@ class Oscillator
         phase_     = 0.0f;
         phase_inc_ = CalcPhaseInc(freq_);
         waveform_  = WAVE_SIN;
-        interval_   = 0.0f; // for smooth random
+        slew_freq_ = 0.1f;
+        interval_  = 0.0f; // for smooth random
         eoc_       = true;
         eor_       = true;
     }
@@ -64,6 +65,7 @@ class Oscillator
     {
         freq_      = f;
         phase_inc_ = CalcPhaseInc(f);
+        slew_freq_ = fclamp(f, 0.f, 1.f);
     }
     inline float GetFreq() { return freq_; }
 
@@ -108,7 +110,7 @@ class Oscillator
   private:
     float   CalcPhaseInc(float f);
     uint8_t waveform_;
-    float   amp_, freq_;
+    float   amp_, freq_, slew_freq_;
     float   sr_, sr_recip_, phase_, phase_inc_;
     float   last_out_, last_freq_;
     bool    eor_, eoc_;

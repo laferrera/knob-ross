@@ -1,8 +1,11 @@
+#include <ArduinoTrace.h>
 #include <Metro.h>
 #include "display.h"
 #include "controls.h"
 #include "menu.h"
 #include "lfo.h"
+
+
 
 #define LED 13
 int ledState = HIGH;
@@ -24,11 +27,10 @@ uint32_t screenStepTime = 6; // ~15fps
 uint32_t channelCalcStepTime = 7;
 // uint32_t midiSendStepTime = 13; 
 uint32_t metroStepTime = 11; //
-uint32_t lfoStepTime = 100;  // 100 microseconds is 10khz
+uint32_t lfoStepTime = 100;  // 100 microseconds is 10Âkhz
 
 void setup() {
   Serial.begin(38400);
-
   while (usbMIDI.read()) {
     // figure out what to do with midi clock....
   }
@@ -43,7 +45,7 @@ void setup() {
   startupScreen();
   initializeChannels();
   initializeButtons();
-  initializeGraphs();
+  // initializeGraphs();
 
   pinMode(LED, OUTPUT);
   digitalWrite(LED, ledState);
@@ -53,13 +55,13 @@ void setup() {
   menu.init(); 
   setupChannelMenu(channels);
   setupMainMenu();
+  menu.reInit();
   menu.drawMenu();
   screenDirty = true;
 }
 
 void loop() {
 // always check buttons and encoders  
-
   buttonCancel.update();
   buttonOkay.update();
 
@@ -79,9 +81,14 @@ void loop() {
       screenDirty = true;
     }
   }
+
   if (buttonOkay.pressed()) {
-    screenDirty = true;
-    menu.registerKeyPress(GEM_KEY_OK);
+    if (curMode == PERFORMANCE) {
+      curGraphIndex = (curGraphIndex + 1) % NUM_OF_CHANNELS;
+    } else {
+      menu.registerKeyPress(GEM_KEY_OK);
+      screenDirty = true;
+    }
   }
 
   long newControlChannelValue = controlChannel.read();
@@ -98,6 +105,7 @@ void loop() {
         controlChannelValue = newControlChannelValue;
     } else if (curMode == PERFORMANCE) {
       curGraphIndex = (curGraphIndex + 1) % NUM_OF_CHANNELS;
+      controlChannelValue = newControlChannelValue;
     }
   }
 
@@ -137,45 +145,18 @@ void loop() {
     if (curMode == PERFORMANCE) {
       drawGraph(curGraphIndex);
     }
-    // Serial.println("Channel 1 Output: " + String(channels[0]->outputValue));
-    // // then do a calc cycle coupled with a midi send cycle...
-    // // two loops
-    // // first loop goes through all the channels in order and gets output value / destination and accumulates it in variable for each channel
-    for (uint8_t i = 0; i < NUM_OF_CHANNELS; i++) {
-      int channelOutputIndex = channels[i]->channelDestination->index;
-    //   // gotta scale the value if other channels are touching the channel.value....
-    //   // i..e if channel2.lfo out goes to channel1.value, the new max value is 2....
-    //   // so maybe need a vector?
-      channelAccumulator[channelOutputIndex] += channels[i]->outputValue;
-      channelScaler[channelOutputIndex] += 1;
-    }
-    //   // second loop goes through accumulatied values
-    for (uint8_t i = 0; i < NUM_OF_CHANNELS; i++) {
-      if(channelAccumulator[i] != prevChannelAccumulator[i]){
-        //   do calculcation on accums.channel1
-        //     usbMIDI.sendControlChange(channels[i]->cc, channelAccumulator[i], MIDI_CHANNEL);
-      }
-    }
-    // // prevChannelAccumulator = channelAccumulator;
-    // std::copy(std::begin(channelAccumulator), std::end(channelAccumulator), std::begin(prevChannelAccumulator));
+  }
 
-    // // reset the accumulator
-    memset(channelAccumulator, 0, sizeof(channelAccumulator));
-    memset(channelScaler, 0, sizeof(channelScaler));
-    // // memset(myarray, 0, N * sizeof(*myarray)); // for heap-allocated arrays, where N is the number of elements
-    // // std::fill(myarray, myarray + N, 0);
+  // metro cycle
+  if (ellapsedMetroMillis > metroStepTime) {
+    if (ledMetro.check() == 1) {
+      ledState = LOW;
+      digitalWrite(LED, ledState);
     }
-
-    // metro cycle
-    if (ellapsedMetroMillis > metroStepTime) {
-      if (ledMetro.check() == 1) {
-        ledState = LOW;
-        digitalWrite(LED, ledState);
-      }
-      // update metro
-      // Serial.println("metro stuff");
-      ellapsedMetroMillis = ellapsedMetroMillis - metroStepTime;
-    }
+    // update metro
+    // Serial.println("metro stuff");
+    ellapsedMetroMillis = ellapsedMetroMillis - metroStepTime;
+  }
 
     // check for incoming midi messages
 
@@ -206,8 +187,13 @@ void loop() {
       // screenDirty = true;
     }
 
+    // if (CrashReport && Serial) {
+    //   Serial.print(CrashReport);
+    // }
+
     if (Serial.available()) {
-      if (CrashReport){
+
+      if (CrashReport) {
         Serial.print(CrashReport);
       }
 
@@ -230,6 +216,7 @@ void loop() {
       }
       if (ch == 'z') {
         menu.registerKeyPress(GEM_KEY_CANCEL);
+        curMode = MAIN_MENU;
       }
       if (ch == 'c') {
         menu.registerKeyPress(GEM_KEY_OK);
@@ -238,27 +225,40 @@ void loop() {
         Serial.println("");
         for(int i = 0; i < NUM_OF_CHANNELS; i++){
           Serial.println("Channel :" + String(i));
-          Serial.println("lfoFreq: " + String(channels[i]->lfoFreq));
           Serial.println("actual lfoFreq" + String(channels[i]->lfo->GetFreq()));
+          Serial.println("lfoFreq: " + String(channels[i]->lfoFreq));
+          Serial.println("lfoAmp: " + String(channels[i]->lfoAmp));
           Serial.println("last graph val: " + String(graphQueues[i].back()));
         }
-
-      }
-      if (ch == 'f') {
-        float freq = 10.0f;
-        channels[0]->lfo->SetFreq(freq);
-        Serial.println("Setting channel 0 lfo freq to: " + String(freq));
-        // Serial.println("Channel 0 lfo addres" + String(channels[0].lfo));
-        float freq2 = 20.0f;
-        channels[1]->lfo->SetFreq(freq);
-        Serial.println("Setting channel 1 lfo freq to: " + String(freq2));
-        // Serial.println("Channel 1 lfo addres" + String(channels[1]lfo));
-        
+        Serial.println("channelAccumulator[1]" + String(channelAccumulator[1]));
       }
       if (ch == 'g') {
-        float freq = 5.0f;
-        channels[0]->lfoFreq = freq;
-        dirtyChannel();
+        Serial.println("Setting Channel 3 output to Channel 1 freq");
+        channels[2]->channelDestinationIndex = 1;
+        channels[2]->outputDestination = OUT_ADD;
+      }
+      if (ch == 'h') {
+        Serial.println("Setting Channel 3 Amp to 0.95");
+        channels[2]->lfoAmp = 0.95;
+        channels[2]->lfo->SetAmp(channels[2]->lfoAmp);
+        channels[2]->lfoFreq = 100.0f;;
+        channels[2]->lfo->SetFreq(channels[2]->lfoFreq);
+      }
+      if (ch == 'j') {
+        Serial.println("Setting Channel 3 Wave to Sqr");
+        channels[2]->lfoWave = 5;
+        channels[2]->lfo->SetWaveform(5);
+      }
+      if (ch == 'e' || ch == '.') {
+        curMode = PERFORMANCE;
+        curGraphIndex = (curGraphIndex + 1) % NUM_OF_CHANNELS;
+        Serial.println("Current Graph Index: " + String(curGraphIndex));
+      }
+      if( ch == '0'){
+        Serial.println("Trying to print the crash report");
+        if (CrashReport) {
+          Serial.print(CrashReport);
+        }
       }
     }
   }

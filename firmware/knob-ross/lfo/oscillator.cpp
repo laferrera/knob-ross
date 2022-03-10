@@ -30,7 +30,7 @@ float Oscillator::Process()
     out = phase_ < PI_F ? (1.0f) : -1.0f;
     break;
   case WAVE_SMOOTH:
-    phase_ += freq_;
+    phase_ += slew_freq_;
     if (phase_ >= 1.0f) {
       phase_ -= 1.0f;
       last_out_ += interval_;

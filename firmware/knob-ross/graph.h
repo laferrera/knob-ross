@@ -55,6 +55,7 @@ void drawGraph(int channelIndex){
         // Serial.println("graph value cast" + String(graphValue));
         display.drawPixel(i, graphValue, WHITE);
     }
+    
     screenDirty = true;
 }
 
