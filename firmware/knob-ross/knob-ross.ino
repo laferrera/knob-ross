@@ -22,6 +22,7 @@ elapsedMillis ellapsedMetroMillis;
 elapsedMicros ellapsedLfoMicros;
 
 int curGraphIndex = 0;
+bool graphHUD = false;
 
 uint32_t screenStepTime = 6; // ~15fps
 uint32_t channelCalcStepTime = 7;
@@ -84,7 +85,7 @@ void loop() {
 
   if (buttonOkay.pressed()) {
     if (curMode == PERFORMANCE) {
-      curGraphIndex = (curGraphIndex + 1) % NUM_OF_CHANNELS;
+      graphHUD = !graphHUD;
     } else {
       menu.registerKeyPress(GEM_KEY_OK);
       screenDirty = true;
@@ -104,9 +105,13 @@ void loop() {
         }
         controlChannelValue = newControlChannelValue;
     } else if (curMode == PERFORMANCE) {
-      curGraphIndex = (curGraphIndex + 1) % NUM_OF_CHANNELS;
-      controlChannelValue = newControlChannelValue;
-    }
+      if (newControlChannelValue > controlChannelValue) {
+        curGraphIndex = (curGraphIndex + 1) % NUM_OF_CHANNELS;
+      } else {
+        curGraphIndex = (curGraphIndex - 1) % NUM_OF_CHANNELS;
+      }
+        controlChannelValue = newControlChannelValue;
+      }
   }
 
   // for (int i = 0; i < SIZE_OF_CHANNELS; i++) {
@@ -143,7 +148,7 @@ void loop() {
 
   if (ellaspedChannelCalcMillis > channelCalcStepTime) {
     if (curMode == PERFORMANCE) {
-      drawGraph(curGraphIndex);
+      drawGraph(curGraphIndex, graphHUD, channels[curGraphIndex]->lfoFreq);
     }
   }
 
@@ -235,7 +240,7 @@ void loop() {
       if (ch == 'g') {
         Serial.println("Setting Channel 3 output to Channel 1 freq");
         channels[2]->channelDestinationIndex = 1;
-        channels[2]->outputDestination = OUT_ADD;
+        channels[2]->outputDestination = OUT_BUS;
       }
       if (ch == 'h') {
         Serial.println("Setting Channel 3 Amp to 0.95");

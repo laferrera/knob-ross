@@ -44,7 +44,7 @@ Button buttonOkay = Button();
 
 // String encoderDestinations[] = {"AMP", "FREQ", "WAVEFORM", "OFFSET"};
 enum encoderDestinations {ENC_AMP, ENC_FREQ, ENC_WAVEFORM, ENC_OFFSET};
-enum outputDestinations {OUT_ADD, OUT_AMP, OUT_FREQ, OUT_WAVEFORM, OUT_OFFSET, OUT_MIDI};
+enum outputDestinations {OUT_BUS, OUT_AMP, OUT_FREQ, OUT_WAVEFORM, OUT_OFFSET, OUT_MIDI};
 enum clipMode {CLIP_HARD, CLIP_SCALE, CLIP_BOUNCE, CLIP_RECTIFY};
 struct Channel {
   uint8_t index;
@@ -63,7 +63,7 @@ struct Channel {
   int lfoFreqBeatOffset;        // 1/64 - 1/32 - 1/16 - 1/8 - 1/4 - 1/2 - look at this how Reason does this...
   int encoderDestination;   // i.e. channel controls value / lfo amp / lfo freq / lfo offset / wave
   int channelDestinationIndex; // which channel id does the lfo control?
-  Channel * channelDestination; // which channel does the lfo control?
+  // Channel * channelDestination; // which channel does the lfo control?
   uint8_t outputDestination;    // which param on channel above does the channel control? value / amp / freq / offset / wave
   daisysp::Oscillator *lfo;
   // lfo param? i.e. pulsewidth
@@ -98,13 +98,14 @@ void initializeChannels(void){
     channel.outputDestination = OUT_MIDI;
     channel.cc = 102 + i;
     channel.phase = 0;
-    channel.clipMode = CLIP_HARD;
-    channel.lfoFreq = 2.0f * (i * 20 + 5);
-    channel.lfoAmp = 0.1f + (i * 0.1f);
-    channel.lfoWave = i % 7;
+    // channel.clipMode = CLIP_HARD;
+    channel.clipMode = CLIP_BOUNCE;
+    channel.lfoFreq = 10.0f;
+    channel.lfoAmp = 0.75f;
+    channel.lfoWave = i % 5;
     channel.lfoAmpOffset = 0;
     channel.channelDestinationIndex = i;
-    channel.channelDestination = &channel;
+    // channel.channelDestination = &channel;
     channel.lfo = lfo;
     *channels[i] = channel;
 
@@ -138,7 +139,7 @@ void processLfos(void) {
     } else {
       int channelDestinationIndex = channels[i]->channelDestinationIndex;
       switch (channels[i]->outputDestination) {
-        case OUT_ADD:
+        case OUT_BUS:
           channelAccumulator[channelDestinationIndex] += lfoOutput;
           channelScaler[channelDestinationIndex] += 1;
           break;
@@ -159,7 +160,7 @@ void processLfos(void) {
           channels[channelDestinationIndex]->lfoAmpOffset = lfoOutput;
           break;
         default:
-          // default is OUT_ADD
+          // default is OUT_BUS
           channelAccumulator[channelDestinationIndex] += lfoOutput;
           channelScaler[channelDestinationIndex] += 1;
           break;
@@ -175,16 +176,16 @@ void processLfos(void) {
         channelAccumulator[i] *= 1.0f / channelScaler[i];
         channelAccumulator[i] = fclamp(channelAccumulator[i], -1.0f, 1.0f);
         break;
-      case CLIP_BOUNCE:
-        while (fabs(channelAccumulator[i] > 1.0f)) {
+      case CLIP_BOUNCE:{
+        while (channelAccumulator[i] > 1.0f || channelAccumulator[i] < -1.0f) {
           if (channelAccumulator[i] > 1.0f) {
             channelAccumulator[i] = 2.0f - channelAccumulator[i];
           } else if (channelAccumulator[i] < -1.0f) {
-            
             channelAccumulator[i] = -2.0f - channelAccumulator[i];
           }
         }
         break;
+      }
       default:
         // default is CLIP_HARD
         channelAccumulator[i] = fclamp(channelAccumulator[i], -1.0f, 1.0f);

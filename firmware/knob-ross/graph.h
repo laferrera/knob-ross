@@ -9,16 +9,16 @@
 
 template <typename T, int MaxLen, typename Container = std::deque<T>>
 class FixedQueue : public std::queue<T, Container> {
-public:
-  void push(const T &value) {
-    if (this->size() == MaxLen) {
-      this->c.pop_front();
+  public:
+    void push(const T &value) {
+      if (this->size() == MaxLen) {
+        this->c.pop_front();
+      }
+      std::queue<T, Container>::push(value);
     }
-    std::queue<T, Container>::push(value);
-  }
-  float operator[](int index) {
-    return this->c[index];
-  }
+    float operator[](int index) {
+      return this->c[index];
+    }
 };
 
 // template <typename T, int MaxLen, typename Container = std::deque<T>>
@@ -33,8 +33,13 @@ public:
 // };
 
 std::array<FixedQueue<float, SCREEN_WIDTH>, NUM_OF_CHANNELS> graphQueues;
+int graphValue;
+String graphChannelLabel;
+String graphChannelHUDFreq;
+String graphChannelHUDAmp;
+String graphChannelHUDWaveform;
 
-void initializeGraphs(){
+void initializeGraphs() {
   for (int i = 0; i < NUM_OF_CHANNELS; i++) {
     for (int j = 0; j < SCREEN_WIDTH; j++) {
       graphQueues[i].push(0);
@@ -42,21 +47,26 @@ void initializeGraphs(){
   }
 }
 
-void drawGraph(int channelIndex){
-    display.clearDisplay();
-    String channeltext = "Channel " + String(channelIndex + 1);
-    // display.setTextSize(1);              // Normal 1:1 pixel scale
-    // display.setTextColor(SSD1306_WHITE); // Draw white text
-    display.setCursor(0, (SCREEN_HEIGHT - 10)); // Start at top-left corner
-    display.println(channeltext);
-    for (int i = 0; i < SCREEN_WIDTH; i++) {
-        int graphValue = static_cast<int>(graphQueues[channelIndex][i] * 32 + 32);
-        // Serial.println("graph value i" + String(graphQueues[channelIndex][i]));
-        // Serial.println("graph value cast" + String(graphValue));
-        display.drawPixel(i, graphValue, WHITE);
-    }
-    
-    screenDirty = true;
+void drawGraph(int channelIndex, bool hud, float hz) {
+  display.clearDisplay();
+  String graphChannelLabel = "Channel " + String(channelIndex + 1);
+  display.setCursor(0, (SCREEN_HEIGHT - 8));
+  display.println(graphChannelLabel);
+  if(hud) {
+    display.setCursor(0, (SCREEN_HEIGHT - 16));
+    graphChannelHUDFreq = String(hz) + " Hz";
+    display.print(graphChannelHUDFreq);
+  } 
+
+
+  for (int i = 0; i < SCREEN_WIDTH; i++) {
+    graphValue = static_cast<int>(graphQueues[channelIndex][i] * 32 + 32);
+    // Serial.println("graph value i" + String(graphQueues[channelIndex][i]));
+    // Serial.println("graph value cast" + String(graphValue));
+    display.drawPixel(i, graphValue, WHITE);
+  }
+
+  screenDirty = true;
 }
 
 #endif

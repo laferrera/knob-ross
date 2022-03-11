@@ -31,7 +31,6 @@
   You should have received a copy of the GNU Lesser General Public License
   along with this library.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include <ArduinoTrace.h>
 #include <Arduino.h>
 #include "GEM_adafruit_gfx.h"
 
@@ -232,9 +231,7 @@ void GEM_adafruit_gfx::drawTitleBar() {
 }
 
 void GEM_adafruit_gfx::printMenuItemString(const char* str, byte num, byte startPos) {
-  DUMP(str);
   byte i = startPos;
-  DUMP(i);
   while (i < num + startPos && str[i] != '\0') {
     _agfx.print(str[i]);
     i++;

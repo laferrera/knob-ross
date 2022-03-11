@@ -17,12 +17,17 @@ const char *learnMenuStr = "Learn";
 const char *globalMenuStr = "Global";
 const char *twoHeadedMonsterStr = "Two-Headed Monster";
 const char *channelsMenuStr = "Channels";
-const char *AmpItemStr = "Amp : ";
-const char *FreqItemStr = "Freq : ";
-const char *CCItemStr = "CC : ";
-const char *phaseItemStr = "Phase : ";
-const char *WaveItemStr = "Wave : ";
-const char *ClipItemStr = "Clip : ";
+const char *AmpItemStr = "Amp";
+const char *FreqItemStr = "Freq";
+const char *CCItemStr = "MIDI CC";
+const char *phaseItemStr = "Phase";
+const char *WaveItemStr = "Wave";
+const char *clipItemStr = "Clip";
+const char *knobItemStr = "Knob Dest";
+const char *channelItemStr = "Channel Dest";
+const char *outputItemStr = "Output Dest";
+const char *waveformItemStr = "Waveform";
+const char *lfoAmpOffsetItemStr = "Offset";
 
 // list<GEMPage> pages;
 // list<GEMItem> items;
@@ -59,7 +64,7 @@ SelectOptionFloat oneTwoEightDecimalArr[] = {{"0", -1.00}, {"1", -0.98}, {"2", -
 SelectOptionFloat freqArr[] = {{"0.001hz", 0.001f},{"0.002hz", 0.002f},{"0.005hz", 0.005f},{"0.01hz", 0.01f},{"0.02hz", 0.02f},{"0.05hz", 0.05f},{"0.1hz", 0.1f},{"0.2hz", 0.2f},{"0.5hz", 0.5f},{"1hz", 1.0f},{"2hz", 2.0f},{"5hz", 5.0f},{"10hz", 10.0f},{"20hz", 20.0f},{"50hz", 50.0f}};
 SelectOptionInt channelDestinationsArr[] = {{"1", 0}, {"2", 1}, {"3", 2}, {"4", 3}, {"5", 4}, {"6", 5}, {"7", 6}, {"8", 7}, {"9", 8}, {"10", 9}, {"11", 10}, {"12", 11}, {"13", 12}, {"14", 13}, {"15", 14}, {"16", 15}};
 SelectOptionInt encoderDestinationsArr[] = {{"Amp", ENC_AMP}, {"Freq", ENC_FREQ}, {"Wave", ENC_WAVEFORM}, {"Offset", ENC_OFFSET}};
-SelectOptionInt outputDestinationsArr[] = {{"Add", OUT_ADD}, {"Amp", OUT_AMP}, {"Freq", OUT_FREQ}, {"Wave", OUT_WAVEFORM}, {"Offset", OUT_OFFSET},{"MIDI", OUT_MIDI}};
+SelectOptionInt outputDestinationsArr[] = {{"Bus", OUT_BUS}, {"Amp", OUT_AMP}, {"Freq", OUT_FREQ}, {"Wave", OUT_WAVEFORM}, {"Offset", OUT_OFFSET},{"MIDI", OUT_MIDI}};
 SelectOptionInt midiCCArr[] = {{"102", 102}, {"103", 103}, {"104", 104}, {"105", 105}, {"106", 106}, {"107", 107}, {"108", 108}, {"109", 109}, {"110", 110}, {"111", 111}, {"112", 112}, {"113", 113}, {"114", 114}, {"115", 115}, {"116", 116}, {"117", 117}, {"118", 118}, {"119", 119}, {"120", 120}, {"121", 121}, {"122", 122}, {"123", 123}, {"124", 124}, {"125", 125}, {"126", 126}, {"127", 127}};
 SelectOptionInt clipModeArr[] = {{"Hard", CLIP_HARD}, {"Scale", CLIP_SCALE}, {"Bounce", CLIP_BOUNCE}};
 // s="{"
@@ -145,9 +150,11 @@ void dirtyChannel() {
 
     channels[i]->lfo->SetFreq(channels[i]->lfoFreq);
     channels[i]->lfo->SetAmp(channels[i]->lfoAmp);
-    // channels[i]->lfo->SetWaveform(channels[i]->lfoWave);
-    // channels[i]->lfo->SetAmp(channels[i]->lfoAmp);
+    channels[i]->lfo->SetWaveform(channels[i]->lfoWave);
     // channels[i]->channelDestination = channels[channels[i]->channelDestinationIndex];
+    if(channels[i]->channelDestinationIndex == i){
+      channels[i]->outputDestination = OUT_BUS;
+    }
     // TODO if channel destination is self, set output destination to amp,
     // hide the channels outputDest menu
   }
@@ -169,33 +176,38 @@ void setupChannelMenu(Channel *channels[]){
     channelPages.push_back(*channelPage);
     GEMItem *channelPageLink = new GEMItem(channelStr, channelPage);
 
-    // GEMItem *channelEncoderDestination = new GEMItem("Knob Dest:", channels[i]->encoderDestination, encoderSelect, dirtyChannel);
-    // GEMItem *channelDestination = new GEMItem("Channel Dest:", channels[i]->channelDestinationIndex, channelSelect, dirtyChannel);
-    // GEMItem *outputDestination = new GEMItem("Output Dest:", channels[i]->outputDestination, outputDestinationSelect, dirtyChannel);
+    GEMItem *encoderDestination = new GEMItem(knobItemStr, channels[i]->encoderDestination, encoderSelect);
+    channelItemHolder.push_back(*encoderDestination);
+    GEMItem *channelDestination = new GEMItem(channelItemStr, channels[i]->channelDestinationIndex, channelSelect);
+    channelItemHolder.push_back(*channelDestination);
+    GEMItem *outputDestination = new GEMItem(outputItemStr, channels[i]->outputDestination, outputDestinationSelect);
+    channelItemHolder.push_back(*outputDestination);
     GEMItem *channelAmp = new GEMItem(AmpItemStr, channels[i]->lfoAmp, negOneToOneSelect, dirtyChannel);
     channelItemHolder.push_back(*channelAmp);
     GEMItem *channelFreq = new GEMItem(FreqItemStr, channels[i]->lfoFreq, freqSelect, dirtyChannel);
     channelItemHolder.push_back(*channelFreq);
-    // GEMItem *channelWave = new GEMItem("Wave:", channels[i]->lfoWave, waveSelect, dirtyChannel);
+    GEMItem *channelWave = new GEMItem(waveformItemStr, channels[i]->lfoWave, waveSelect, dirtyChannel);
+    channelItemHolder.push_back(*channelWave);
     GEMItem *channelCC = new GEMItem(CCItemStr, channels[i]->cc, midiCCSelect);
     channelItemHolder.push_back(*channelCC);
     GEMItem *channelPhase = new GEMItem(phaseItemStr, channels[i]->phase, oneTwoEightSelect);
     channelItemHolder.push_back(*channelPhase);
-    GEMItem *clipMode = new GEMItem(ClipItemStr, channels[i]->clipMode, clipModeSelect);
+    GEMItem *clipMode = new GEMItem(clipItemStr, channels[i]->clipMode, clipModeSelect);
     channelItemHolder.push_back(*clipMode);
+    GEMItem *lfoAmpOffset = new GEMItem(lfoAmpOffsetItemStr, channels[i]->lfoAmpOffset, negOneToOneSelect);
+    channelItemHolder.push_back(*lfoAmpOffset);
 
-    // channelPage->addMenuItem(*channelEncoderDestination);
-    // channelPage->addMenuItem(*channelDestination);
-    // channelPage->addMenuItem(*outputDestination); 
-    channelPage->addMenuItem(*channelAmp);
     channelPage->addMenuItem(*channelFreq);
-    // channelPage->addMenuItem(*channelWave);
-
+    channelPage->addMenuItem(*channelAmp);
+    channelPage->addMenuItem(*channelWave);
+    channelPage->addMenuItem(*lfoAmpOffset);
+    channelPage->addMenuItem(*encoderDestination);
+    channelPage->addMenuItem(*channelDestination);
+    channelPage->addMenuItem(*outputDestination);
     channelPage->addMenuItem(*clipMode);
     channelPage->addMenuItem(*channelPhase);
     channelPage->addMenuItem(*channelCC);
-    
-
+  
     channelsMenuPage.addMenuItem(*channelPageLink);
     channelPage->setParentMenuPage(channelsMenuPage);
     channelPageItems.push_back(channelItemHolder);
