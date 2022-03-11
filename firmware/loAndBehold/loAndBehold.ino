@@ -5,8 +5,6 @@
 #include "menu.h"
 #include "lfo.h"
 
-
-
 #define LED 13
 int ledState = HIGH;
 Metro ledMetro = Metro(250);

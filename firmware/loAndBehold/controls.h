@@ -8,7 +8,7 @@
 #include "lfo/oscillator.cpp"
 #include "graph.h"
 
-float samplerate = 10000.0f;
+float samplerate = 5000.0f;
 std::vector<daisysp::Oscillator> oscillators;
 
 float channelAccumulator[] = {0,0,0,0,0,0,0,0};
@@ -46,6 +46,7 @@ Button buttonOkay = Button();
 enum encoderDestinations {ENC_AMP, ENC_FREQ, ENC_WAVEFORM, ENC_OFFSET};
 enum outputDestinations {OUT_BUS, OUT_AMP, OUT_FREQ, OUT_WAVEFORM, OUT_OFFSET, OUT_MIDI};
 enum clipMode {CLIP_HARD, CLIP_SCALE, CLIP_BOUNCE, CLIP_RECTIFY};
+enum lfoShapes {LFO_NONE, LFO_SIN, LFO_TRI, LFO_SAW, LFO_RAMP,LFO_SQUARE, LFO_SMOOTH, LFO_RANDOM};
 struct Channel {
   uint8_t index;
   float outputValue;            // -1 to 1
