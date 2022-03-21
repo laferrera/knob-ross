@@ -8,7 +8,7 @@
 #include "lfo/oscillator.cpp"
 #include "graph.h"
 
-float samplerate = 5000.0f;
+float samplerate = 10000.0f;
 std::vector<daisysp::Oscillator> oscillators;
 
 float channelAccumulator[] = {0,0,0,0,0,0,0,0};
@@ -17,28 +17,28 @@ float prevChannelAccumulator[] = {0,0,0,0,0,0,0,0};
 
 bool channelsDirty = false;
 // Encoder enc1(0, 1);
-Encoder enc1(15, 16);
-Encoder enc2(2, 3);
-Encoder enc3(4, 5);
-Encoder enc4(6, 7);
-Encoder enc5(8, 9);
-Encoder enc6(10, 11);
-Encoder enc7(12, 24);
+Encoder enc1(24, 25);
+Encoder enc2(28, 29);
+Encoder enc3(30, 31);
+Encoder enc4(0, 1);
+Encoder enc5(39, 40);
+Encoder enc6(39, 40);
+Encoder enc7(39, 40);
 // skip 13, cause that's led
-Encoder enc8(25, 26);
-Encoder enc9(27, 28);
-Encoder enc10(29, 30);
-Encoder enc11(31, 32);
-Encoder enc12(33, 34);
-Encoder enc13(35, 36);
-Encoder enc14(37, 38);
+Encoder enc8(39, 40);
+Encoder enc9(39, 40);
+Encoder enc10(39, 40);
+Encoder enc11(39, 40);
+Encoder enc12(39, 40);
+Encoder enc13(39, 40);
+Encoder enc14(39, 40);
 Encoder enc15(39, 40);
-Encoder enc16(41, 14);
+Encoder enc16(39, 40);
 // Encoder controlChannel(15, 16);
-Encoder controlChannel(0, 1);
+Encoder controlChannel(10, 11);
 int controlChannelValue = 0;
-int buttonCancelPin = 6; 
-int buttonOkayPin = 12;
+int buttonCancelPin = 3; 
+int buttonOkayPin = 7;
 Button buttonCancel = Button();
 Button buttonOkay = Button();
 
@@ -101,7 +101,7 @@ void initializeChannels(void){
     channel.phase = 0;
     // channel.clipMode = CLIP_HARD;
     channel.clipMode = CLIP_BOUNCE;
-    channel.lfoFreq = 10.0f;
+    channel.lfoFreq = 100.0f;
     channel.lfoAmp = 0.75f;
     channel.lfoWave = i % 5;
     channel.lfoAmpOffset = 0;

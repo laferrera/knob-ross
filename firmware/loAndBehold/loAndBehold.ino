@@ -67,6 +67,7 @@ void loop() {
 
 
   if (buttonCancel.pressed()) {
+    Serial.println("CANCEL");
     // menu.registerKeyPress(GEM_KEY_CANCEL);
     // screenDirty = true;
     if (curMode == PERFORMANCE){
@@ -77,11 +78,13 @@ void loop() {
       menu.drawMenu();
     } else {
       menu.registerKeyPress(GEM_KEY_CANCEL);
+      
       screenDirty = true;
     }
   }
 
   if (buttonOkay.pressed()) {
+    Serial.println("OKAY");
     if (curMode == PERFORMANCE) {
       graphHUD = !graphHUD;
     } else {
@@ -112,23 +115,23 @@ void loop() {
       }
   }
 
-  // for (int i = 0; i < SIZE_OF_CHANNELS; i++) {
-  //   long newChannelValue = encoders[i]->read();
-  //   if (newChannelValue != channels[i]->encoder_value) {
-  //     channelsDirty = true;
-  //     ellapsedEncoderTouchMillis = 0;
-  //     screenSaver = false;
-  //     channels[i]->encoderValue = newChannelValue;
-  //     usbMIDI.sendControlChange(channels[i]->cc, newChannelValue, MIDI_CHANNEL);
-  //     ledState = HIGH;
-  //     digitalWrite(LED, ledState);
-  //     ledMetro.interval(250);
-  //     String channeltext = "channel " + String(i + 1) + ": " + String(newChannelValue);
-  //     // drawText(channeltext, 1);
-  //     Serial.println(channeltext);
-  //     // drawText(channeltext, 9 * (i + 2));
-  //   }
-  // }
+  for (int i = 0; i < NUM_OF_CHANNELS; i++) {
+    long newChannelValue = encoders[i]->read();
+    if (newChannelValue != channels[i]->encoderValue) {
+      channelsDirty = true;
+      // ellapsedEncoderTouchMillis = 0;
+      // screenSaver = false;
+      channels[i]->encoderValue = newChannelValue;
+      // usbMIDI.sendControlChange(channels[i]->cc, newChannelValue, MIDI_CHANNEL);
+      ledState = HIGH;
+      digitalWrite(LED, ledState);
+      ledMetro.interval(250);
+      String channeltext = "channel " + String(i + 1) + ": " + String(newChannelValue);
+      // drawText(channeltext, 1);
+      Serial.println(channeltext);
+      // drawText(channeltext, 9 * (i + 2));
+    }
+  }
 
   // screen cycle
   if (screenDirty && (ellapsedDisplayMillis > screenStepTime)) {

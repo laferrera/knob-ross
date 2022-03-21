@@ -1,0 +1,25 @@
+multimeter says it was coming out at 5.17v.... 
+
+
+https://github.com/elkayem/midi2cv
+float semitone = 68.25f;
+4096 values / 5
+~819 per octave
+semitone = 68.2667f
+0v = 0
+1v = 819
+2v = 1638
+3v = 2457
+4v = 3276
+~5v = 4095
+
+
+// Rescale 88 notes to 4096 mV:
+//    noteMsg = 0 -> 0 mV 
+//    noteMsg = 87 -> 4096 mV
+// DAC output will be (4095/87) = 47.069 mV per note, and 564.9655 mV per octive
+// Note that DAC output will need to be amplified by 1.77X for the standard 1V/octave 
+
+#define NOTE_SF 47.069f // This value can be tuned if CV output isn't exactly 1V/octave
+  unsigned int mV = (unsigned int) ((float) noteMsg * NOTE_SF + 0.5); 
+  setVoltage(DAC1, 0, 1, mV);  // DAC1, channel 0, gain = 2X
