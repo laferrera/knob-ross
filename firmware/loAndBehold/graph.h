@@ -66,7 +66,7 @@ void drawGraph(int channelIndex, bool hud, float hz) {
     
     // graphValue = static_cast<int>(graphQueues[channelIndex][i] * (-32) + 32);
     // Result := ((Input - InputLow) / (InputHigh - InputLow)) * (OutputHigh - OutputLow) + OutputLow;
-    graphValue = static_cast<int>(((graphQueues[channelIndex][i] + 1) / 2) * -63 + 63);
+    graphValue = int(((graphQueues[channelIndex][i] + 1) / 2) * -63 + 63);
 
     display.drawPixel(i, graphValue, WHITE);
   }

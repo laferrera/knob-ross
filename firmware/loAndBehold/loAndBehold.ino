@@ -6,6 +6,7 @@
 #include "lfo.h"
 
 #define LED 13
+int encoderSens = 4;
 int ledState = HIGH;
 Metro ledMetro = Metro(250);
 
@@ -94,8 +95,8 @@ void loop() {
   }
 
   long newControlChannelValue = controlChannel.read();
-  if ((newControlChannelValue != controlChannelValue) && (abs(newControlChannelValue - controlChannelValue) > 4)) {
-  // if (newControlChannelValue != controlChannelValue) {
+  if ((newControlChannelValue != controlChannelValue) && (abs(newControlChannelValue - controlChannelValue) > encoderSens)) {
+    // if (newControlChannelValue != controlChannelValue) {
     if (curMode != PERFORMANCE) {
         if (newControlChannelValue > controlChannelValue) {
           menu.registerKeyPress(GEM_KEY_DOWN);

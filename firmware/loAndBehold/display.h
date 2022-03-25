@@ -18,6 +18,7 @@
 #define OLED_RESET -1       // Reset pin # (or -1 if sharing Arduino reset pin)
 #define SCREEN_ADDRESS 0x3C /// use Examples/Wire/Scanner to find the i2c address
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+String biosStrings[] = {"loading pizza...", "loading fonts...", "loading waveshapes...", "loading.", "loading..", "loading...", "loading....", "expanding your mind", "by being wasted", "expanding your mind", "by being wasted", "optimizing", "optimizing.", "optimizing..", "optimizing..."};
 
 bool screenDirty = false;
 bool screenSaver = false;
@@ -43,6 +44,15 @@ void startupScreen(){
   display.display();
   delay(1000);
   display.clearDisplay();
+  // for (int i = 0; i < 12; i++) {
+  for(int i=0; i<sizeof(biosStrings)/sizeof(biosStrings[0]); i++) {
+    display.setCursor(0, (SCREEN_HEIGHT - 8));
+    display.println(biosStrings[i]);
+    display.display();
+    delay(100);
+    display.clearDisplay();
+  }
+  display.setCursor(0,15);
   for(int i = 0; i < 3; i++){
     display.println("lo and behold   lo and behold");
     display.display();

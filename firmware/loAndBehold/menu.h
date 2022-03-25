@@ -8,6 +8,7 @@
 
 enum modes { MAIN_MENU, PERFORMANCE, CHANNEL, TEMPO, LEARN, GLOBAL, TWO_HEADED_MONSTER}
 curMode = MAIN_MENU;
+// curMode = PERFORMANCE;
 
 const char *channelStr = "Channel";
 const char *mainMenuStr = "Main Menu";
