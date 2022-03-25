@@ -121,14 +121,35 @@ void loop() {
       channelsDirty = true;
       // ellapsedEncoderTouchMillis = 0;
       // screenSaver = false;
+      long encoderDifference = newChannelValue - channels[i]->encoderValue;  
       channels[i]->encoderValue = newChannelValue;
+      
+      switch (channels[i]->encoderDestination){
+        // case ENC_AMP:
+        //   newChannelValue = newChannelValue + channels[i]->lfoFreq;
+        //   channels[i]->lfoFreq = newChannelValue;
+        //   channels[i]->lfo->SetFreq(channels[i]->lfoFreq);
+        //   break;
+        // case ENC_FREQ:
+        //   newChannelValue = newChannelValue + channels[i]->lfoAmp;
+        //   channels[i]->lfoAmp = newChannelValue;
+        //   channels[i]->lfo->SetAmp(channels[i]->lfoAmp);
+        //   break;
+        case ENC_OFFSET:
+          float newSetting = (0.01f * encoderDifference) + channels[i]->lfoAmpOffset;
+          newSetting = constrain(newSetting, -1.0f, 1.0f);
+          Serial.println("setting channel offset to: " + String(newSetting));
+          channels[i]->lfoAmpOffset = newSetting;
+          break;
+      }
+      
       // usbMIDI.sendControlChange(channels[i]->cc, newChannelValue, MIDI_CHANNEL);
       ledState = HIGH;
       digitalWrite(LED, ledState);
       ledMetro.interval(250);
-      String channeltext = "channel " + String(i + 1) + ": " + String(newChannelValue);
+      // Serial.println("channel " + String(i + 1) + ": " + String(newChannelValue));
+      // Serial.println("channel encoder difference" + String(i + 1) + ": " + String(encoderDifference));
       // drawText(channeltext, 1);
-      Serial.println(channeltext);
       // drawText(channeltext, 9 * (i + 2));
     }
   }
@@ -231,7 +252,9 @@ void loop() {
         Serial.println("");
         for(int i = 0; i < NUM_OF_CHANNELS; i++){
           Serial.println("Channel :" + String(i));
-          Serial.println("actual lfoFreq" + String(channels[i]->lfo->GetFreq()));
+          Serial.println("Output Value : " + String(channels[i]->outputValue));
+          Serial.println("Offset : " + String(channels[i]->lfoAmpOffset));
+          Serial.println("actual lfoFreq: " + String(channels[i]->lfo->GetFreq()));
           Serial.println("lfoFreq: " + String(channels[i]->lfoFreq));
           Serial.println("lfoAmp: " + String(channels[i]->lfoAmp));
           Serial.println("last graph val: " + String(graphQueues[i].back()));

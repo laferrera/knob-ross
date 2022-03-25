@@ -95,12 +95,12 @@ void initializeChannels(void){
     channel.index = i;
     channel.outputValue = 0;
     channel.encoderValue = 0;
-    channel.encoderDestination = ENC_AMP;
+    channel.encoderDestination = ENC_OFFSET;
     channel.outputDestination = OUT_MIDI;
     channel.cc = 102 + i;
     channel.phase = 0;
-    // channel.clipMode = CLIP_HARD;
-    channel.clipMode = CLIP_BOUNCE;
+    channel.clipMode = CLIP_HARD;
+    // channel.clipMode = CLIP_BOUNCE;
     channel.lfoFreq = 100.0f;
     channel.lfoAmp = 0.75f;
     channel.lfoWave = i % 5;
@@ -136,6 +136,7 @@ void processLfos(void) {
       channels[i]->outputValue = lfoOutput;
       // graphQueues[i].push(channels[i]->outputValue);
       channelAccumulator[i] += lfoOutput;
+      channelAccumulator[i] += channels[i]->lfoAmpOffset;
       channelScaler[i] += 1;
     } else {
       int channelDestinationIndex = channels[i]->channelDestinationIndex;
