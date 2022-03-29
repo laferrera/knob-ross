@@ -92,10 +92,10 @@ void loop() {
       menu.setMenuPageCurrent(tempoMenuPage);
       menu.drawMenu();
     } else if (curMode == MAIN_MENU) {
-      menu.registerKeyPress(GEM_KEY_CANCEL);
       if (menu.getMenuPageCurrent() == mainMenuStr) {
         setModeToPerformance();
       }
+      menu.registerKeyPress(GEM_KEY_CANCEL);
       screenDirty = true;
     }
   }

@@ -55,18 +55,37 @@ std::vector<GEMPage> channelPages;
 std::vector<std::vector <GEMItem>> channelPageItems;
 std::vector<std::vector<GEMItem>> channelPageLinks;
 // TODO make arrays or vectors for the different channelMenuItems 
-// std::vector<void (*)()> dirtyChannelFunctions;
 
-// void dirtyChannel(u_int8_t index);
-// void dirtyChannel1(){dirtyChannel(1);};
-// void dirtyChannel2(){dirtyChannel(2);};
-// void dirtyChannel3(){dirtyChannel(3);};
-// void dirtyChannel4(){dirtyChannel(4);};
-// void dirtyChannel5(){dirtyChannel(5);};
-// void dirtyChannel6(){dirtyChannel(6);};
-// void dirtyChannel7(){dirtyChannel(7);};
-// void dirtyChannel8(){dirtyChannel(8);};
 
+void dirtyChannel(int chIndex) {
+  Serial.println("Dirty channel: " + String(chIndex));
+  channels[chIndex]->lfo->SetFreq(channels[chIndex]->lfoFreq);
+  channels[chIndex]->lfo->SetAmp(channels[chIndex]->lfoAmp);
+  channels[chIndex]->lfo->SetWaveform(channels[chIndex]->lfoWave);
+  // if channel destination is self, set output destination to bus, hide the channels outputDest menu item
+  if (channels[chIndex]->channelDestinationIndex == chIndex) {
+    Serial.println("where are we ? channel: " + String(channelPageItems[chIndex][2].getTitle()));
+    Serial.println("where are we 2?: " + String(channelPageItems[chIndex][2].getTitle()));
+    Serial.println("output destination: " + String(channels[chIndex]->outputDestination));
+    channels[chIndex]->outputDestination = OUT_BUS;
+    channelPageItems[chIndex][2].hide(true);
+  } else {
+    channelPageItems[chIndex][2].hide(false);
+  }
+  Serial.println("output destination2: " + String(channels[chIndex]->outputDestination));
+}
+
+void dirtyChannel0(){dirtyChannel(0);};
+void dirtyChannel1(){dirtyChannel(1);};
+void dirtyChannel2(){dirtyChannel(2);};
+void dirtyChannel3(){dirtyChannel(3);};
+void dirtyChannel4(){dirtyChannel(4);};
+void dirtyChannel5(){dirtyChannel(5);};
+void dirtyChannel6(){dirtyChannel(6);};
+void dirtyChannel7(){dirtyChannel(7);};
+void dirtyChannel8(){dirtyChannel(8);};
+
+std::vector<void (*)()> dirtyChannelFunctions = {dirtyChannel0, dirtyChannel1, dirtyChannel2, dirtyChannel3, dirtyChannel4, dirtyChannel5, dirtyChannel6, dirtyChannel7, dirtyChannel8};
 
 // this example https://github.com/Spirik/GEM/blob/master/examples/AdafruitGFX/Example-03_Party-Hard/Example-03_Party-Hard.ino
 GEM_adafruit_gfx menu(display, GEM_POINTER_ROW, GEM_ITEMS_COUNT_AUTO, 12);
@@ -143,61 +162,31 @@ void setupMainMenu() {
   
 }
 
-// void setupBankMenu(Bank bank){
 
-// }
-
-// void setupDirtyChannelFunctions(){
-//   dirtyChannelFunctions.push_back(dirtyChannel1);
-//   dirtyChannelFunctions.push_back(dirtyChannel2);
-// }
-
-void dirtyChannel() {
-  Serial.println("Dirty channel");
-  for (int i = 0; i < NUM_OF_CHANNELS; i++) {
-    channels[i]->lfo->SetFreq(channels[i]->lfoFreq);
-    channels[i]->lfo->SetAmp(channels[i]->lfoAmp);
-    channels[i]->lfo->SetWaveform(channels[i]->lfoWave);
-    // channels[i]->channelDestination = channels[channels[i]->channelDestinationIndex];
-    if(channels[i]->channelDestinationIndex == i){
-      channels[i]->outputDestination = OUT_BUS;
-    }
-    // TODO if channel destination is self, set output destination to amp,
-    // hide the channels outputDest menu
-  }
-}
 
 void setupChannelMenus(){
   for (int i = 0; i < NUM_OF_CHANNELS; i++) {
     std::vector<GEMItem> channelItemHolder;
-
-    // todo fix this string issue....
-    //  String channelName = "Channel " + String(i);
-    //  const char *channelStr = channelName.c_str();
-    //  // char *channelStr = channelName.c_str();
 
     const char *thisChannelStr = channelStrings[i];
     GEMPage *channelPage = new GEMPage(thisChannelStr);
     channelPages.push_back(*channelPage);
     GEMItem *channelPageLink = new GEMItem(thisChannelStr, channelPage);
 
-    // this works but every channel has the same name
-    // GEMPage *channelPage = new GEMPage(channelStr);
-    // channelPages.push_back(*channelPage);
-    // GEMItem *channelPageLink = new GEMItem(channelStr, channelPage);
+
 
     GEMItem *encoderDestination = new GEMItem(knobItemStr, channels[i]->encoderDestination, encoderSelect);
     channelItemHolder.push_back(*encoderDestination);
     // not sure why, but adding a callback fixed a crash....
-    GEMItem *channelDestination = new GEMItem(channelItemStr, channels[i]->channelDestinationIndex, channelSelect, dirtyChannel);
+    GEMItem *channelDestination = new GEMItem(channelItemStr, channels[i]->channelDestinationIndex, channelSelect, dirtyChannelFunctions[i]);
     channelItemHolder.push_back(*channelDestination);
     GEMItem *outputDestination = new GEMItem(outputItemStr, channels[i]->outputDestination, outputDestinationSelect);
     channelItemHolder.push_back(*outputDestination);
-    GEMItem *channelAmp = new GEMItem(AmpItemStr, channels[i]->lfoAmp, negOneToOneSelect, dirtyChannel);
+    GEMItem *channelAmp = new GEMItem(AmpItemStr, channels[i]->lfoAmp, negOneToOneSelect, dirtyChannelFunctions[i]);
     channelItemHolder.push_back(*channelAmp);
-    GEMItem *channelFreq = new GEMItem(FreqItemStr, channels[i]->lfoFreq, freqSelect, dirtyChannel);
+    GEMItem *channelFreq = new GEMItem(FreqItemStr, channels[i]->lfoFreq, freqSelect, dirtyChannelFunctions[i]);
     channelItemHolder.push_back(*channelFreq);
-    GEMItem *channelWave = new GEMItem(waveformItemStr, channels[i]->lfoWave, waveSelect, dirtyChannel);
+    GEMItem *channelWave = new GEMItem(waveformItemStr, channels[i]->lfoWave, waveSelect, dirtyChannelFunctions[i]);
     channelItemHolder.push_back(*channelWave);
     GEMItem *channelCC = new GEMItem(CCItemStr, channels[i]->cc, midiCCSelect);
     channelItemHolder.push_back(*channelCC);
