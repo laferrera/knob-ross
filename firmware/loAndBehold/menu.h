@@ -7,12 +7,6 @@
 #include <string>
 #include "tempo.h"
 
-enum modes { MAIN_MENU, PERFORMANCE, CHANNEL, TAP_TEMPO, LEARN, GLOBAL, TWO_HEADED_MONSTER}
-// curMode = MAIN_MENU;
-// curMode = PERFORMANCE;
-curMode = TAP_TEMPO;
-// float menuBPM = 120.0f;
-
 const char *channelStr = "Channel";
 const char *mainMenuStr = "Main Menu";
 const char *performanceMenuStr = "Twist";

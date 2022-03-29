@@ -16,6 +16,7 @@ int encoderSens = 1;
 int ledState = HIGH;
 Metro ledMetro = Metro(250);
 Tempo tempo;
+modes curMode = TAP_TEMPO;
 
 #define MIDI_CHANNEL 1
 
