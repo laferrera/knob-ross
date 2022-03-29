@@ -3,11 +3,12 @@
 #define TEMPO_H
 
 #include "src/ArduinoTapTempo/ArduinoTapTempo.h"
-#include "globals.h"
+
+
 class Tempo
 {
   public:
-    float globalBPM = 120.0f;
+    // float globalBPM = 120.0f;
 
     static const int MAX_BEAT_LENGTH_MS = 2000; // 30.0bpm
     static const int MIN_TEMPO = 250; // 240.0bpm

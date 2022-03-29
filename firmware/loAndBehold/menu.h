@@ -11,7 +11,7 @@ enum modes { MAIN_MENU, PERFORMANCE, CHANNEL, TAP_TEMPO, LEARN, GLOBAL, TWO_HEAD
 // curMode = MAIN_MENU;
 // curMode = PERFORMANCE;
 curMode = TAP_TEMPO;
-float menuBPM = 120.0f;
+// float menuBPM = 120.0f;
 
 const char *channelStr = "Channel";
 const char *mainMenuStr = "Main Menu";
@@ -116,7 +116,7 @@ GEMItem twoHeadedMonsterMenuLink(twoHeadedMonsterStr, twoHeadedMonsterMenuPage);
 
 GEMItem performanceMenuItemButton(performanceMenuStr, setModeToPerformance);
 void dirtyBPM();
-GEMItem bpmItem(bpmStr, menuBPM, dirtyBPM);
+GEMItem bpmItem(bpmStr, globalBPM, dirtyBPM);
 GEMItem tapTempoMenuItemButton(tapTempoStr, setModeToTapTempo);
 
 // GEMItem menuItemInt("Number:", bad_ui_number);
@@ -232,7 +232,7 @@ void setupChannelMenus(){
 }
 
 void dirtyBPM(){
-  // tempo.setBPM(menuBPM);
+  // _tempo.setBPM(menuBPM);
 }
 
 void setupTempoMenu(){
@@ -257,6 +257,15 @@ void setupMenus() {
   setupChannelMenus();
   setupTempoMenu();
 }
+
+class LoMenu{
+  public:
+    void setupMenus();
+    void setupTempoMenu();
+
+  private:
+    Tempo _tempo;
+};
 
 #endif
 // some Ruby generators for those Options, need to have const char * strings, so need to precompute.

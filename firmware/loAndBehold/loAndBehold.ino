@@ -1,4 +1,5 @@
 #include <ArduinoTrace.h>
+#include "globals.h"
 #include <Metro.h>
 #include <algorithm>
 #include <iomanip>
@@ -6,7 +7,7 @@
 #include "controls.h"
 #include "tempo.h"
 #include "menu.h"
-#include "lfo.h"
+// #include "lfo.h"
 // #include "globals.h"
 
 
@@ -57,7 +58,7 @@ void setup() {
   pinMode(LED, OUTPUT);
   digitalWrite(LED, ledState);
 
-  setupLfos();
+  // setupLfos();
 
   menu.init();
   setupMenus();
