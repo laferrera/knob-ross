@@ -1,14 +1,19 @@
 #include <ArduinoTrace.h>
 #include <Metro.h>
+#include <algorithm>
+#include <iomanip>
 #include "display.h"
 #include "controls.h"
 #include "menu.h"
 #include "lfo.h"
+#include "tempo.h"
+
 
 #define LED 13
 int encoderSens = 4;
 int ledState = HIGH;
 Metro ledMetro = Metro(250);
+Tempo tempo;
 
 #define MIDI_CHANNEL 1
 
@@ -27,7 +32,7 @@ uint32_t screenStepTime = 6; // ~15fps
 uint32_t channelCalcStepTime = 7;
 // uint32_t midiSendStepTime = 13; 
 uint32_t metroStepTime = 11; //
-uint32_t lfoStepTime = 100;  // 100 microseconds is 10Âkhz
+uint32_t lfoStepTime = 100;  // 100 microseconds is 10khz
 
 void setup() {
   Serial.begin(38400);
@@ -41,7 +46,6 @@ void setup() {
     for (;;)
       ; // Don't proceed, loop forever
   }
-
   startupScreen();
   initializeChannels();
   initializeButtons();
@@ -52,10 +56,9 @@ void setup() {
 
   setupLfos();
 
-  menu.init(); 
-  setupChannelMenu(channels);
-  setupMainMenu();
-  menu.reInit();
+  menu.init();
+  setupMenus();
+  menu.reInit(); // necessary?
   menu.drawMenu();
   screenDirty = true;
 }
@@ -68,27 +71,35 @@ void loop() {
 
 
   if (buttonCancel.pressed()) {
-    Serial.println("CANCEL");
-    // menu.registerKeyPress(GEM_KEY_CANCEL);
-    // screenDirty = true;
+    // Serial.println("CANCEL");
     if (curMode == PERFORMANCE){
       Serial.println("switching curMode to MAIN_MENU");
       curMode = MAIN_MENU;
       display.clearDisplay();
       menu.reInit();
       menu.drawMenu();
-    } else {
+    } else if (curMode == TAP_TEMPO){
+      curMode = MAIN_MENU;
+      display.clearDisplay();
+      menu.reInit();
+      menu.setMenuPageCurrent(tempoMenuPage);
+      menu.drawMenu();
+    } else if (curMode == MAIN_MENU) {
       menu.registerKeyPress(GEM_KEY_CANCEL);
-      
+      if (menu.getMenuPageCurrent() == mainMenuStr) {
+        setModeToPerformance();
+      }
       screenDirty = true;
     }
   }
 
   if (buttonOkay.pressed()) {
-    Serial.println("OKAY");
+    // Serial.println("OKAY");
     if (curMode == PERFORMANCE) {
       graphHUD = !graphHUD;
-    } else {
+    } else if (curMode == TAP_TEMPO) {
+      tempo.tap(true);
+    } else if (curMode == MAIN_MENU) {
       menu.registerKeyPress(GEM_KEY_OK);
       screenDirty = true;
     }
@@ -97,7 +108,7 @@ void loop() {
   long newControlChannelValue = controlChannel.read();
   if ((newControlChannelValue != controlChannelValue) && (abs(newControlChannelValue - controlChannelValue) > encoderSens)) {
     // if (newControlChannelValue != controlChannelValue) {
-    if (curMode != PERFORMANCE) {
+    if (curMode == MAIN_MENU) {
         if (newControlChannelValue > controlChannelValue) {
           menu.registerKeyPress(GEM_KEY_DOWN);
           screenDirty = true;
@@ -111,6 +122,7 @@ void loop() {
         curGraphIndex = (curGraphIndex + 1) % NUM_OF_CHANNELS;
       } else {
         curGraphIndex = (curGraphIndex - 1) % NUM_OF_CHANNELS;
+        if (curGraphIndex < 0) { curGraphIndex = NUM_OF_CHANNELS - 1;}
       }
         controlChannelValue = newControlChannelValue;
       }
@@ -126,20 +138,46 @@ void loop() {
       channels[i]->encoderValue = newChannelValue;
       
       switch (channels[i]->encoderDestination){
-        // case ENC_AMP:
-        //   newChannelValue = newChannelValue + channels[i]->lfoFreq;
-        //   channels[i]->lfoFreq = newChannelValue;
-        //   channels[i]->lfo->SetFreq(channels[i]->lfoFreq);
-        //   break;
-        // case ENC_FREQ:
-        //   newChannelValue = newChannelValue + channels[i]->lfoAmp;
-        //   channels[i]->lfoAmp = newChannelValue;
-        //   channels[i]->lfo->SetAmp(channels[i]->lfoAmp);
-        //   break;
-        case ENC_OFFSET:
-          float newSetting = (0.01f * encoderDifference) + channels[i]->lfoAmpOffset;
+        float newSetting;
+        case ENC_AMP:
+          newSetting = (0.01f * encoderDifference) + channels[i]->lfoAmp;
           newSetting = constrain(newSetting, -1.0f, 1.0f);
-          Serial.println("setting channel offset to: " + String(newSetting));
+          // Serial.println("setting channel lfo amp to: " + String(newSetting));
+          channels[i]->lfoAmp = newSetting;
+          channels[i]->lfo->SetAmp(channels[i]->lfoAmp);
+          break;
+        case ENC_FREQ:
+            // Todo: this works when going positive, but not when going negative
+            if (encoderDifference > 0) {
+              if (channels[i]->lfoFreq >= 10.0f) {
+                newSetting = (1.f * encoderDifference) + floor(channels[i]->lfoFreq) + 0.0f;
+              } else if (channels[i]->lfoFreq <= 0.01f) {
+                newSetting = (0.001f * encoderDifference) + channels[i]->lfoFreq;
+              } else if (channels[i]->lfoFreq <= 0.1f) {
+                newSetting = (0.01f * encoderDifference) + channels[i]->lfoFreq;
+              } else if (channels[i]->lfoFreq <= 10.f) {
+                newSetting = (0.1f * encoderDifference) + channels[i]->lfoFreq;
+              } 
+            } else {
+              if (channels[i]->lfoFreq >= 11.0f) {
+                newSetting = (1.f * encoderDifference) + floor(channels[i]->lfoFreq) + 0.0f;
+              } else if (channels[i]->lfoFreq <= 0.02f) {
+                newSetting = (0.001f * encoderDifference) + channels[i]->lfoFreq;
+              } else if (channels[i]->lfoFreq <= 0.2f) {
+                newSetting = (0.01f * encoderDifference) + channels[i]->lfoFreq;
+              } else if (channels[i]->lfoFreq <= 11.f) {
+                newSetting = (0.1f * encoderDifference) + channels[i]->lfoFreq;
+              }
+            }
+          newSetting = constrain(newSetting, .001f, 100.0f);
+          Serial.println("setting channel lfo freq to: " + String(newSetting, 3));
+          channels[i]->lfoFreq = newSetting;
+          channels[i]->lfo->SetFreq(channels[i]->lfoFreq);
+          break;
+        case ENC_OFFSET:
+          newSetting = (0.01f * encoderDifference) + channels[i]->lfoAmpOffset;
+          newSetting = constrain(newSetting, -1.0f, 1.0f);
+          // Serial.println("setting channel offset to: " + String(newSetting));
           channels[i]->lfoAmpOffset = newSetting;
           break;
       }
@@ -210,7 +248,8 @@ void loop() {
     } else if (curMode == CHANNEL) {
       // channelMenu.drawMenu();
       // screenDirty = true;
-    } else if (curMode == TEMPO) {
+    } else if (curMode == TAP_TEMPO) {
+      drawTapTempoScreen(tempo.getBPM());
       // tempoMenu.drawMenu();
       // screenDirty = true;
     }
@@ -249,15 +288,19 @@ void loop() {
       if (ch == 'c') {
         menu.registerKeyPress(GEM_KEY_OK);
       }
+      if (ch == 't') {
+        Serial.println("Tempo: " + String(tempo.getBPM()));
+      }
       if (ch == 'p') {
         Serial.println("");
         for(int i = 0; i < NUM_OF_CHANNELS; i++){
           Serial.println("Channel :" + String(i));
           Serial.println("Output Value : " + String(channels[i]->outputValue));
+          Serial.println("Encoder Destination : " + String(channels[i]->encoderDestination));
           Serial.println("Offset : " + String(channels[i]->lfoAmpOffset));
-          Serial.println("actual lfoFreq: " + String(channels[i]->lfo->GetFreq()));
-          Serial.println("lfoFreq: " + String(channels[i]->lfoFreq));
-          Serial.println("lfoAmp: " + String(channels[i]->lfoAmp));
+          Serial.println("Oscillator lfoFreq: " + String(channels[i]->lfo->GetFreq(), 3));
+          Serial.println("Knob lfoFreq: " + String(channels[i]->lfoFreq, 3));
+          Serial.println("Knob lfoAmp: " + String(channels[i]->lfoAmp));
           Serial.println("last graph val: " + String(graphQueues[i].back()));
         }
         Serial.println("channelAccumulator[1]" + String(channelAccumulator[1]));
@@ -283,6 +326,9 @@ void loop() {
         curMode = PERFORMANCE;
         curGraphIndex = (curGraphIndex + 1) % NUM_OF_CHANNELS;
         Serial.println("Current Graph Index: " + String(curGraphIndex));
+      }
+      if( ch == 'm'){
+        Serial.println("Current menu is: " + String(menu.getMenuPageCurrent()));
       }
       if( ch == '0'){
         Serial.println("Trying to print the crash report");

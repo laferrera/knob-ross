@@ -60,11 +60,6 @@ void drawGraph(int channelIndex, bool hud, float hz) {
 
 
   for (int i = 0; i < SCREEN_WIDTH; i++) {
-    // TODO find the real problem here....
-    // graphValue = graphQueues[channelIndex][i] != NULL ? 0 : graphQueues[channelIndex][i];
-    // graphValue = static_cast<int>(graphValue * 32 + 32);
-    
-    // graphValue = static_cast<int>(graphQueues[channelIndex][i] * (-32) + 32);
     // Result := ((Input - InputLow) / (InputHigh - InputLow)) * (OutputHigh - OutputLow) + OutputLow;
     graphValue = int(((graphQueues[channelIndex][i] + 1) / 2) * -63 + 63);
 

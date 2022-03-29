@@ -42,14 +42,14 @@ void startupScreen(){
   display.setTextColor(SSD1306_WHITE); // Draw white text
   display.drawBitmap(0, 0, ampamp_logo, 128, 64, 1);
   display.display();
-  delay(1000);
+  delay(500);
   display.clearDisplay();
   // for (int i = 0; i < 12; i++) {
-  for(int i=0; i<sizeof(biosStrings)/sizeof(biosStrings[0]); i++) {
+  for (size_t i = 0; i < sizeof(biosStrings) / sizeof(biosStrings[0]); i++) {
     display.setCursor(0, (SCREEN_HEIGHT - 8));
     display.println(biosStrings[i]);
     display.display();
-    delay(100);
+    delay(rand() % 100 + 75);
     display.clearDisplay();
   }
   display.setCursor(0,15);
@@ -63,6 +63,14 @@ void startupScreen(){
   }
   display.setTextWrap(true);
   display.clearDisplay();
+}
+
+void drawTapTempoScreen(float tempo){
+  display.clearDisplay();
+  String tempoString = "Current Tempo :" + String(tempo) + " bpm";
+  display.setCursor(0, (SCREEN_HEIGHT - 8));
+  display.println(tempoString);
+  screenDirty = true;
 }
 
 #endif

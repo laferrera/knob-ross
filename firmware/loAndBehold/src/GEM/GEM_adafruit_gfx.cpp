@@ -197,6 +197,10 @@ void GEM_adafruit_gfx::setMenuPageCurrent(GEMPage& menuPageCurrent) {
   _menuPageCurrent = &menuPageCurrent;
 }
 
+const char* GEM_adafruit_gfx::getMenuPageCurrent() {
+  return _menuPageCurrent->title;
+}
+
 //====================== CONTEXT OPERATIONS
 
 void GEM_adafruit_gfx::clearContext() {

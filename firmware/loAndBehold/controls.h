@@ -95,13 +95,13 @@ void initializeChannels(void){
     channel.index = i;
     channel.outputValue = 0;
     channel.encoderValue = 0;
-    channel.encoderDestination = ENC_OFFSET;
+    channel.encoderDestination = ENC_FREQ;
     channel.outputDestination = OUT_MIDI;
     channel.cc = 102 + i;
     channel.phase = 0;
     channel.clipMode = CLIP_HARD;
     // channel.clipMode = CLIP_BOUNCE;
-    channel.lfoFreq = 100.0f;
+    channel.lfoFreq = 50.f;
     channel.lfoAmp = 0.75f;
     channel.lfoWave = i % 5;
     channel.lfoAmpOffset = 0;

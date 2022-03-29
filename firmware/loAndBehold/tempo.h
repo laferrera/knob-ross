@@ -2,6 +2,7 @@
 #ifndef TEMPO_H
 #define TEMPO_H
 
+#include "src/ArduinoTapTempo/ArduinoTapTempo.h"
 class Tempo
 {
   public:
@@ -13,6 +14,8 @@ class Tempo
     void setClickRate(int amount, int type);          // bar, 1/2, 1/4, 1/8, 1/16, 1/32, 1/64
 
     inline unsigned long getBeatLength() { return beatLengthMS; } // returns the length of the beat in milliseconds
+    
+    void tap(bool buttonDown);                                 // call this each time you read your button state, accepts a boolean indicating if the button is down
 
   private:
     // config
@@ -25,6 +28,8 @@ class Tempo
     // private methods
     void test_tap(unsigned long ms);
 
+    // tap tempo
+    ArduinoTapTempo tapTempo;
 };
 
 
