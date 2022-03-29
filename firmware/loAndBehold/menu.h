@@ -7,8 +7,9 @@
 #include <string>
 
 enum modes { MAIN_MENU, PERFORMANCE, CHANNEL, TAP_TEMPO, LEARN, GLOBAL, TWO_HEADED_MONSTER}
-curMode = MAIN_MENU;
+// curMode = MAIN_MENU;
 // curMode = PERFORMANCE;
+curMode = TAP_TEMPO;
 
 const char *channelStr = "Channel";
 const char *mainMenuStr = "Main Menu";

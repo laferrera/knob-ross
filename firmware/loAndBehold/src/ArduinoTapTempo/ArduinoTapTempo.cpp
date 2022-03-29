@@ -61,6 +61,7 @@ bool ArduinoTapTempo::isChainActive()
 bool ArduinoTapTempo::isChainActive(unsigned long ms)
 {
   return lastTapMS + maxBeatLengthMS > ms && lastTapMS + (beatLengthMS * beatsUntilChainReset) > ms;
+
 }
 
 float ArduinoTapTempo::beatProgress()
@@ -72,9 +73,11 @@ void ArduinoTapTempo::update(bool buttonDown)
 {
   unsigned long ms = millis();
 
+  // TODO - why is this buttonDownOld here?
   // if a tap has occured...
-  if(buttonDown && !buttonDownOld)
-    tap(ms);
+  // if(buttonDown && !buttonDownOld)
+  //   tap(ms);
+  tap(ms);
 
   buttonDownOld = buttonDown;
   millisSinceResetOld = millisSinceReset;
