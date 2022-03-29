@@ -4,13 +4,14 @@
 #include <iomanip>
 #include "display.h"
 #include "controls.h"
+#include "tempo.h"
 #include "menu.h"
 #include "lfo.h"
-#include "tempo.h"
+// #include "globals.h"
 
 
 #define LED 13
-int encoderSens = 4;
+int encoderSens = 1;
 int ledState = HIGH;
 Metro ledMetro = Metro(250);
 Tempo tempo;
@@ -46,7 +47,9 @@ void setup() {
     for (;;)
       ; // Don't proceed, loop forever
   }
-  startupScreen();
+  display.setRotation(2);
+  // TODO add startupscreenback
+  // startupScreen();
   initializeChannels();
   initializeButtons();
   // initializeGraphs();
@@ -136,9 +139,9 @@ void loop() {
       // screenSaver = false;
       long encoderDifference = newChannelValue - channels[i]->encoderValue;  
       channels[i]->encoderValue = newChannelValue;
-      
+
+      float newSetting = 0.0f;
       switch (channels[i]->encoderDestination){
-        float newSetting;
         case ENC_AMP:
           newSetting = (0.01f * encoderDifference) + channels[i]->lfoAmp;
           newSetting = constrain(newSetting, -1.0f, 1.0f);

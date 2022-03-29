@@ -19,5 +19,5 @@
 // Support for editable float variables enabled by default.
 // Can be disabled either by defining GEM_DISABLE_FLOAT_EDIT (via compiler flag or define) or manual edition here.
 #ifndef GEM_DISABLE_FLOAT_EDIT
-// #include "config/support-float-edit.h"  // Support for editable float and double variables (option selects support them regardless of this setting)
+#include "config/support-float-edit.h"  // Support for editable float and double variables (option selects support them regardless of this setting)
 #endif

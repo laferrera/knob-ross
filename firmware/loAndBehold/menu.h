@@ -5,11 +5,13 @@
 // #include <GEM_adafruit_gfx.h>
 #include <vector>
 #include <string>
+#include "tempo.h"
 
 enum modes { MAIN_MENU, PERFORMANCE, CHANNEL, TAP_TEMPO, LEARN, GLOBAL, TWO_HEADED_MONSTER}
 // curMode = MAIN_MENU;
 // curMode = PERFORMANCE;
 curMode = TAP_TEMPO;
+float menuBPM = 120.0f;
 
 const char *channelStr = "Channel";
 const char *mainMenuStr = "Main Menu";
@@ -34,6 +36,7 @@ const char *lfoAmpOffsetItemStr = "Offset";
 
 const char *setTempoStr = "Tempo";
 const char *tapTempoStr = "Tap Tempo";
+const char *bpmStr = "BPM";
 
 const char *channel1Str = "Ch 1";
 const char *channel2Str = "Ch 2";
@@ -112,6 +115,8 @@ GEMItem globalMenuLink(globalMenuStr, globalMenuPage);
 GEMItem twoHeadedMonsterMenuLink(twoHeadedMonsterStr, twoHeadedMonsterMenuPage);
 
 GEMItem performanceMenuItemButton(performanceMenuStr, setModeToPerformance);
+void dirtyBPM();
+GEMItem bpmItem(bpmStr, menuBPM, dirtyBPM);
 GEMItem tapTempoMenuItemButton(tapTempoStr, setModeToTapTempo);
 
 // GEMItem menuItemInt("Number:", bad_ui_number);
@@ -177,56 +182,61 @@ void setupChannelMenus(){
     //  const char *channelStr = channelName.c_str();
     //  // char *channelStr = channelName.c_str();
 
-      const char *thisChannelStr = channelStrings[i];
-      GEMPage *channelPage = new GEMPage(thisChannelStr);
-      channelPages.push_back(*channelPage);
-      GEMItem *channelPageLink = new GEMItem(thisChannelStr, channelPage);
+    const char *thisChannelStr = channelStrings[i];
+    GEMPage *channelPage = new GEMPage(thisChannelStr);
+    channelPages.push_back(*channelPage);
+    GEMItem *channelPageLink = new GEMItem(thisChannelStr, channelPage);
 
-      // this works but every channel has the same name
-      // GEMPage *channelPage = new GEMPage(channelStr);
-      // channelPages.push_back(*channelPage);
-      // GEMItem *channelPageLink = new GEMItem(channelStr, channelPage);
+    // this works but every channel has the same name
+    // GEMPage *channelPage = new GEMPage(channelStr);
+    // channelPages.push_back(*channelPage);
+    // GEMItem *channelPageLink = new GEMItem(channelStr, channelPage);
 
-      GEMItem *encoderDestination = new GEMItem(knobItemStr, channels[i]->encoderDestination, encoderSelect);
-      channelItemHolder.push_back(*encoderDestination);
-      // not sure why, but adding a callback fixed a crash....
-      GEMItem *channelDestination = new GEMItem(channelItemStr, channels[i]->channelDestinationIndex, channelSelect, dirtyChannel);
-      channelItemHolder.push_back(*channelDestination);
-      GEMItem *outputDestination = new GEMItem(outputItemStr, channels[i]->outputDestination, outputDestinationSelect);
-      channelItemHolder.push_back(*outputDestination);
-      GEMItem *channelAmp = new GEMItem(AmpItemStr, channels[i]->lfoAmp, negOneToOneSelect, dirtyChannel);
-      channelItemHolder.push_back(*channelAmp);
-      GEMItem *channelFreq = new GEMItem(FreqItemStr, channels[i]->lfoFreq, freqSelect, dirtyChannel);
-      channelItemHolder.push_back(*channelFreq);
-      GEMItem *channelWave = new GEMItem(waveformItemStr, channels[i]->lfoWave, waveSelect, dirtyChannel);
-      channelItemHolder.push_back(*channelWave);
-      GEMItem *channelCC = new GEMItem(CCItemStr, channels[i]->cc, midiCCSelect);
-      channelItemHolder.push_back(*channelCC);
-      GEMItem *channelPhase = new GEMItem(phaseItemStr, channels[i]->phase, oneTwoEightSelect);
-      channelItemHolder.push_back(*channelPhase);
-      GEMItem *clipMode = new GEMItem(clipItemStr, channels[i]->clipMode, clipModeSelect);
-      channelItemHolder.push_back(*clipMode);
-      GEMItem *lfoAmpOffset = new GEMItem(lfoAmpOffsetItemStr, channels[i]->lfoAmpOffset, negOneToOneSelect);
-      channelItemHolder.push_back(*lfoAmpOffset);
+    GEMItem *encoderDestination = new GEMItem(knobItemStr, channels[i]->encoderDestination, encoderSelect);
+    channelItemHolder.push_back(*encoderDestination);
+    // not sure why, but adding a callback fixed a crash....
+    GEMItem *channelDestination = new GEMItem(channelItemStr, channels[i]->channelDestinationIndex, channelSelect, dirtyChannel);
+    channelItemHolder.push_back(*channelDestination);
+    GEMItem *outputDestination = new GEMItem(outputItemStr, channels[i]->outputDestination, outputDestinationSelect);
+    channelItemHolder.push_back(*outputDestination);
+    GEMItem *channelAmp = new GEMItem(AmpItemStr, channels[i]->lfoAmp, negOneToOneSelect, dirtyChannel);
+    channelItemHolder.push_back(*channelAmp);
+    GEMItem *channelFreq = new GEMItem(FreqItemStr, channels[i]->lfoFreq, freqSelect, dirtyChannel);
+    channelItemHolder.push_back(*channelFreq);
+    GEMItem *channelWave = new GEMItem(waveformItemStr, channels[i]->lfoWave, waveSelect, dirtyChannel);
+    channelItemHolder.push_back(*channelWave);
+    GEMItem *channelCC = new GEMItem(CCItemStr, channels[i]->cc, midiCCSelect);
+    channelItemHolder.push_back(*channelCC);
+    GEMItem *channelPhase = new GEMItem(phaseItemStr, channels[i]->phase, oneTwoEightSelect);
+    channelItemHolder.push_back(*channelPhase);
+    GEMItem *clipMode = new GEMItem(clipItemStr, channels[i]->clipMode, clipModeSelect);
+    channelItemHolder.push_back(*clipMode);
+    GEMItem *lfoAmpOffset = new GEMItem(lfoAmpOffsetItemStr, channels[i]->lfoAmpOffset, negOneToOneSelect);
+    channelItemHolder.push_back(*lfoAmpOffset);
 
-      channelPage->addMenuItem(*channelFreq);
-      channelPage->addMenuItem(*channelAmp);
-      channelPage->addMenuItem(*channelWave);
-      channelPage->addMenuItem(*lfoAmpOffset);
-      channelPage->addMenuItem(*encoderDestination);
-      channelPage->addMenuItem(*channelDestination);
-      channelPage->addMenuItem(*outputDestination);
-      channelPage->addMenuItem(*clipMode);
-      channelPage->addMenuItem(*channelPhase);
-      channelPage->addMenuItem(*channelCC);
+    channelPage->addMenuItem(*channelFreq);
+    channelPage->addMenuItem(*channelAmp);
+    channelPage->addMenuItem(*channelWave);
+    channelPage->addMenuItem(*lfoAmpOffset);
+    channelPage->addMenuItem(*encoderDestination);
+    channelPage->addMenuItem(*channelDestination);
+    channelPage->addMenuItem(*outputDestination);
+    channelPage->addMenuItem(*clipMode);
+    channelPage->addMenuItem(*channelPhase);
+    channelPage->addMenuItem(*channelCC);
 
-      channelsMenuPage.addMenuItem(*channelPageLink);
-      channelPage->setParentMenuPage(channelsMenuPage);
-      channelPageItems.push_back(channelItemHolder);
+    channelsMenuPage.addMenuItem(*channelPageLink);
+    channelPage->setParentMenuPage(channelsMenuPage);
+    channelPageItems.push_back(channelItemHolder);
   }
 }
 
+void dirtyBPM(){
+  // tempo.setBPM(menuBPM);
+}
+
 void setupTempoMenu(){
+  tempoMenuPage.addMenuItem(bpmItem);
   tempoMenuPage.addMenuItem(tapTempoMenuItemButton);
 }
 

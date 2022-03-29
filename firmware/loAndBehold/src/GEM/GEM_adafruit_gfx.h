@@ -214,6 +214,11 @@ class GEM_adafruit_gfx {
     void nextEditValueSelect();
     void prevEditValueSelect();
     void drawEditValueSelect();
+
+    void nextEditValueFloat();
+    void prevEditValueFloat();
+    void drawEditValueFloat();
+
     void saveEditValue();
     void cancelEditValue();
     void exitEditValue(boolean redrawMenu = true);

@@ -39,8 +39,8 @@
 #define GEM_STR_LEN 17
 
 // Macro constant (alias) for default precision of the float and double variables (the number of digits after the decimal sign as required by dtostrf())
-#define GEM_FLOAT_PREC 6
-#define GEM_DOUBLE_PREC 6
+#define GEM_FLOAT_PREC 2
+#define GEM_DOUBLE_PREC 2
 
 // Macro constants (aliases) for menu pointer visual appearance
 #define GEM_POINTER_DASH 0  // Current menu item is marked with pointer (filled square) to the left of its name

@@ -557,6 +557,8 @@ void GEM_adafruit_gfx::initEditValueCursor() {
   _editValueVirtualCursorPosition = 0;
   if (_editValueType == GEM_VAL_SELECT) {
     drawEditValueSelect();
+  } else if(_editValueType == GEM_VAL_FLOAT || _editValueType == GEM_VAL_DOUBLE) {
+    drawEditValueFloat();
   } else {
     char chr = _valueString[_editValueVirtualCursorPosition];
     drawEditValueDigit(chr);
@@ -600,7 +602,7 @@ void GEM_adafruit_gfx::prevEditValueCursorPosition() {
 void GEM_adafruit_gfx::drawEditValueCursor(boolean clear) {
   int pointerPosition = getCurrentItemTopOffset(false);
   byte cursorLeftOffset = _menuValuesLeftOffset + _editValueCursorPosition * _menuItemFont[_menuItemFontSize].width;
-  if (_editValueType == GEM_VAL_SELECT) {
+  if (_editValueType == GEM_VAL_SELECT || _editValueType == GEM_VAL_FLOAT || _editValueType == GEM_VAL_DOUBLE) {
     _agfx.fillRect(cursorLeftOffset - 1, pointerPosition - 1, _agfx.width() - cursorLeftOffset - 1, _menuItemHeight + 1, clear ? _menuBackgroundColor : _menuForegroundColor);
   } else {
     _agfx.fillRect(cursorLeftOffset - 1, pointerPosition - 1, _menuItemFont[_menuItemFontSize].width + 1, _menuItemHeight + 1, clear ? _menuBackgroundColor : _menuForegroundColor);
@@ -719,8 +721,8 @@ void GEM_adafruit_gfx::nextEditValueSelect() {
 }
 
 void GEM_adafruit_gfx::prevEditValueSelect() {
-  GEMItem* menuItemTmp = _menuPageCurrent->getCurrentMenuItem();
-  GEMSelect* select = menuItemTmp->select;
+  // GEMItem* menuItemTmp = _menuPageCurrent->getCurrentMenuItem();
+  // GEMSelect* select = menuItemTmp->select;
   if (_valueSelectNum > 0) {
     _valueSelectNum--;
   }
@@ -743,6 +745,43 @@ void GEM_adafruit_gfx::drawEditValueSelect() {
   _agfx.setTextColor(_menuForegroundColor);
 }
 
+
+
+// trying to figure out how to do this with floats...
+
+
+void GEM_adafruit_gfx::nextEditValueFloat() {
+  GEMItem* menuItemTmp = _menuPageCurrent->getCurrentMenuItem();
+  dtostrf((atof(_valueString) + 0.1f), menuItemTmp->precision + 1, menuItemTmp->precision, _valueString);
+  drawEditValueFloat();
+}
+
+void GEM_adafruit_gfx::prevEditValueFloat() {
+  GEMItem* menuItemTmp = _menuPageCurrent->getCurrentMenuItem();
+  dtostrf((atof(_valueString) - 0.1f), menuItemTmp->precision + 1, menuItemTmp->precision, _valueString);
+  drawEditValueFloat();
+}
+
+void GEM_adafruit_gfx::drawEditValueFloat() {
+  // GEMItem* menuItemTmp = _menuPageCurrent->getCurrentMenuItem();
+  // GEMSelect* select = menuItemTmp->select;
+  drawEditValueCursor ();
+  _agfx.setTextColor(_menuBackgroundColor);
+  
+  int pointerPosition = getCurrentItemTopOffset(false);
+  byte yText = pointerPosition + getMenuItemInsetOffset() + _menuItemFont[_menuItemFontSize].baselineOffset;
+  _agfx.setCursor(_menuValuesLeftOffset, yText);
+  printMenuItemValue(_valueString);
+  _agfx.drawBitmap(_agfx.width() - 7, getCurrentItemTopOffset(true, true), selectArrows_bits, selectArrows_width, selectArrows_height, _menuBackgroundColor);
+  _agfx.setTextColor(_menuForegroundColor);
+}
+
+
+
+
+
+
+
 void GEM_adafruit_gfx::saveEditValue() {
   GEMItem* menuItemTmp = _menuPageCurrent->getCurrentMenuItem();
   void* temp;
@@ -764,7 +803,7 @@ void GEM_adafruit_gfx::saveEditValue() {
       break;
     #ifdef GEM_SUPPORT_FLOAT_EDIT
     case GEM_VAL_FLOAT:
-      *(float*)menuItemTmp->linkedVariable = atof(_valueString);
+      *(float *)menuItemTmp->linkedVariable = atof(_valueString);
       break;
     case GEM_VAL_DOUBLE:
       *(double*)menuItemTmp->linkedVariable = atof(_valueString);
@@ -854,6 +893,8 @@ void GEM_adafruit_gfx::dispatchKeyPress() {
         case GEM_KEY_UP:
           if (_editValueType == GEM_VAL_SELECT) {
             prevEditValueSelect();
+          } else if (_editValueType == GEM_VAL_FLOAT) {
+            prevEditValueFloat();
           } else {
             nextEditValueDigit();
           }
@@ -866,6 +907,8 @@ void GEM_adafruit_gfx::dispatchKeyPress() {
         case GEM_KEY_DOWN:
           if (_editValueType == GEM_VAL_SELECT) {
             nextEditValueSelect();
+          } else if (_editValueType == GEM_VAL_FLOAT) {
+            nextEditValueFloat();
           } else {
             prevEditValueDigit();
           }

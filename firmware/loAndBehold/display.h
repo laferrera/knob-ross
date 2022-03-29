@@ -36,7 +36,6 @@ void drawText(String text, uint8_t line) {
 
 void startupScreen(){
   display.setFont(&font04B_034pt7b);
-  display.setRotation(2);
   display.clearDisplay();
   display.setTextSize(1);              // Normal 1:1 pixel scale
   display.setTextColor(SSD1306_WHITE); // Draw white text
