@@ -20,3 +20,8 @@ void Tempo::tap(bool buttonDown){
   }
   setBPM(tapTempo.getBPM());
 }
+
+
+float Tempo::getBPMFreq(int numerator, int denominator){
+  return 60000.0 / (beatLengthMS * numerator / denominator);
+}

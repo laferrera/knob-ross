@@ -15,6 +15,7 @@ class Tempo
   
     float getBPM(); // returns the number of beats per minute
     float setBPM(float bpm); // sets the number of beats per minute
+    float getBPMFreq(int numerator, int denominator); // returns the number of beats per minute
     void setClickRate(int amount, int type);          // bar, 1/2, 1/4, 1/8, 1/16, 1/32, 1/64
 
     inline unsigned long getBeatLength() { return beatLengthMS; } // returns the length of the beat in milliseconds
