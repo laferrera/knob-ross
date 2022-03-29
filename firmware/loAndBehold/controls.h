@@ -1,21 +1,18 @@
 #pragma once
 #ifndef CONTROLS_H
 #define CONTROLS_H
-#define NUM_OF_CHANNELS 8
 
 #include <Bounce2.h>
 #include <Encoder.h>
 #include "lfo/oscillator.cpp"
 #include "graph.h"
 
-float samplerate = 10000.0f;
 std::vector<daisysp::Oscillator> oscillators;
 
 float channelAccumulator[] = {0,0,0,0,0,0,0,0};
 int channelScaler[] = {0,0,0,0,0,0,0,0};
 float prevChannelAccumulator[] = {0,0,0,0,0,0,0,0};
 
-bool channelsDirty = false;
 // Encoder enc1(0, 1);
 Encoder enc1(24, 25);
 Encoder enc2(28, 29);
@@ -43,10 +40,7 @@ Button buttonCancel = Button();
 Button buttonOkay = Button();
 
 // String encoderDestinations[] = {"AMP", "FREQ", "WAVEFORM", "OFFSET"};
-enum encoderDestinations {ENC_AMP, ENC_FREQ, ENC_WAVEFORM, ENC_OFFSET};
-enum outputDestinations {OUT_BUS, OUT_AMP, OUT_FREQ, OUT_WAVEFORM, OUT_OFFSET, OUT_MIDI};
-enum clipMode {CLIP_HARD, CLIP_SCALE, CLIP_BOUNCE, CLIP_RECTIFY};
-enum lfoShapes {LFO_NONE, LFO_SIN, LFO_TRI, LFO_SAW, LFO_RAMP,LFO_SQUARE, LFO_SMOOTH, LFO_RANDOM};
+
 struct Channel {
   uint8_t index;
   float outputValue;            // -1 to 1
@@ -90,7 +84,7 @@ void initializeChannels(void){
     daisysp::Oscillator *lfo = new daisysp::Oscillator;
     oscillators.push_back(*lfo);
     // Serial.printf("Pointer lives at %p.\n", (void *)lfo);
-    lfo->Init(samplerate);
+    lfo->Init(SAMPLERATE);
     Channel channel;
     channel.index = i;
     channel.outputValue = 0;

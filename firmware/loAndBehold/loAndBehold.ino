@@ -24,7 +24,7 @@ modes curMode = TAP_TEMPO;
 elapsedMillis ellapsedDisplayMillis;
 elapsedMillis ellaspedChannelCalcMillis;
 // elapsedMillis ellapsedMidiSendMillis;
-elapsedMillis ellapsedEncoderTouchMillis;
+elapsedMillis ellapsedTouchMillis;
 elapsedMillis ellapsedMetroMillis;
 elapsedMicros ellapsedLfoMicros;
 
@@ -76,6 +76,8 @@ void loop() {
 
 
   if (buttonCancel.pressed()) {
+    screenSaver = false;
+    ellapsedTouchMillis = 0;
     // Serial.println("CANCEL");
     if (curMode == PERFORMANCE){
       Serial.println("switching curMode to MAIN_MENU");
@@ -99,6 +101,8 @@ void loop() {
   }
 
   if (buttonOkay.pressed()) {
+    screenSaver = false;
+    ellapsedTouchMillis = 0;
     // Serial.println("OKAY");
     if (curMode == PERFORMANCE) {
       graphHUD = !graphHUD;
@@ -112,6 +116,8 @@ void loop() {
 
   long newControlChannelValue = controlChannel.read();
   if ((newControlChannelValue != controlChannelValue) && (abs(newControlChannelValue - controlChannelValue) > encoderSens)) {
+    screenSaver = false;
+    ellapsedTouchMillis = 0;
     // if (newControlChannelValue != controlChannelValue) {
     if (curMode == MAIN_MENU) {
         if (newControlChannelValue > controlChannelValue) {
@@ -136,9 +142,6 @@ void loop() {
   for (int i = 0; i < NUM_OF_CHANNELS; i++) {
     long newChannelValue = encoders[i]->read();
     if (newChannelValue != channels[i]->encoderValue) {
-      channelsDirty = true;
-      // ellapsedEncoderTouchMillis = 0;
-      // screenSaver = false;
       long encoderDifference = newChannelValue - channels[i]->encoderValue;  
       channels[i]->encoderValue = newChannelValue;
 
@@ -182,24 +185,18 @@ void loop() {
         case ENC_OFFSET:
           newSetting = (0.01f * encoderDifference) + channels[i]->lfoAmpOffset;
           newSetting = constrain(newSetting, -1.0f, 1.0f);
-          // Serial.println("setting channel offset to: " + String(newSetting));
           channels[i]->lfoAmpOffset = newSetting;
           break;
       }
-      
       // usbMIDI.sendControlChange(channels[i]->cc, newChannelValue, MIDI_CHANNEL);
       ledState = HIGH;
       digitalWrite(LED, ledState);
       ledMetro.interval(250);
-      // Serial.println("channel " + String(i + 1) + ": " + String(newChannelValue));
-      // Serial.println("channel encoder difference" + String(i + 1) + ": " + String(encoderDifference));
-      // drawText(channeltext, 1);
-      // drawText(channeltext, 9 * (i + 2));
     }
   }
 
   // screen cycle
-  if (screenDirty && (ellapsedDisplayMillis > screenStepTime)) {
+  if (screenDirty && !screenSaver && (ellapsedDisplayMillis > screenStepTime)) {
     // update display
     // Serial.println("updating display");
     ellapsedDisplayMillis = ellapsedDisplayMillis - screenStepTime;
@@ -235,13 +232,13 @@ void loop() {
     // menu.drawMenu();
 
     // screensaver cycle
-    // if (!screenSaver && (ellapsedEncoderTouchMillis > SCREEN_SAVER_TIMEOUT_MS)) {
-    //   // update display
-    //   screenSaver = true;
-    //   display.fillScreen(SSD1306_BLACK);
-    //   display.display();
-    //   Serial.println("screensaver on ");
-    // }
+    if (!screenSaver && (ellapsedTouchMillis > SCREEN_SAVER_TIMEOUT_MS)) {
+      // update display
+      screenSaver = true;
+      display.fillScreen(SSD1306_BLACK);
+      display.display();
+      Serial.println("screensaver on ");
+    }
 
     if (curMode == MAIN_MENU) {
       //    menu.drawMenu();
@@ -272,7 +269,7 @@ void loop() {
       char ch = Serial.read();
       Serial.print(ch);
       if (ch) {
-        ellapsedEncoderTouchMillis = 0;
+        ellapsedTouchMillis = 0;
       }
       if (ch == 'w') {
         menu.registerKeyPress(GEM_KEY_UP);

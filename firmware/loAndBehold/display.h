@@ -10,10 +10,6 @@
 #include "font04B_03_4pt.h"
 #include "images.h"
 
-// #define SCREEN_SAVER_TIMEOUT_MS 100000
-#define SCREEN_SAVER_TIMEOUT_MS 10000
-#define SCREEN_WIDTH 128
-#define SCREEN_HEIGHT 64
 
 #define OLED_RESET -1       // Reset pin # (or -1 if sharing Arduino reset pin)
 #define SCREEN_ADDRESS 0x3C /// use Examples/Wire/Scanner to find the i2c address

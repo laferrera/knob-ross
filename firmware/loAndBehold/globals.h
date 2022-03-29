@@ -3,10 +3,18 @@
 
 #define NUM_OF_CHANNELS 8
 #define SAMPLERATE 10000.0f
-// other defines go here
+#define NUM_OF_CHANNELS 8
+#define SCREEN_SAVER_TIMEOUT_MS 10000
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
 
 extern float globalBPM;
 enum modes { MAIN_MENU, PERFORMANCE, CHANNEL, TAP_TEMPO, LEARN, GLOBAL, TWO_HEADED_MONSTER} ;
 extern modes curMode;
+
+enum encoderDestinations {ENC_AMP, ENC_FREQ, ENC_WAVEFORM, ENC_OFFSET};
+enum outputDestinations {OUT_BUS, OUT_AMP, OUT_FREQ, OUT_WAVEFORM, OUT_OFFSET, OUT_MIDI};
+enum clipMode {CLIP_HARD, CLIP_SCALE, CLIP_BOUNCE, CLIP_RECTIFY};
+enum lfoShapes {LFO_NONE, LFO_SIN, LFO_TRI, LFO_SAW, LFO_RAMP,LFO_SQUARE, LFO_SMOOTH, LFO_RANDOM};
 
 #endif // GLOBALS_H
