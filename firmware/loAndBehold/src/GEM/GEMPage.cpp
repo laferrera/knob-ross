@@ -130,6 +130,7 @@ void GEMPage::showMenuItem(GEMItem& menuItem) {
     }
   }
   if (_menuItemBack.linkedPage != nullptr && itemsCount > 1) {
-    currentItemNum = 1;
+    // not sure why we'd want to go back to the top of the menu list
+    // currentItemNum = 1;
   }
 }

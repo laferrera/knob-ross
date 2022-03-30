@@ -792,7 +792,6 @@ void GEM_adafruit_gfx::drawEditValueFloat() {
 
 void GEM_adafruit_gfx::saveEditValue() {
   GEMItem* menuItemTmp = _menuPageCurrent->getCurrentMenuItem();
-  void* temp;
   switch (menuItemTmp->linkedType) {
     case GEM_VAL_INTEGER:
       *(int*)menuItemTmp->linkedVariable = atoi(_valueString);
