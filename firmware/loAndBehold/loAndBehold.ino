@@ -119,10 +119,18 @@ void loop() {
     ellapsedTouchMillis = 0;
     if (curMode == MAIN_MENU) {
         if (newControlChannelValue > controlChannelValue) {
-          menu.registerKeyPress(GEM_KEY_DOWN);
+          if(encDelta > (encoderSens * 2)){
+            menu.registerKeyPress(GEM_KEY_BIG_DOWN);
+          } else {
+            menu.registerKeyPress(GEM_KEY_DOWN);
+          }
           screenDirty = true;
         } else {
-          menu.registerKeyPress(GEM_KEY_UP);
+          if (encDelta > (encoderSens * 2)) {
+            menu.registerKeyPress(GEM_KEY_BIG_UP);
+          } else {
+            menu.registerKeyPress(GEM_KEY_UP);
+          }
           screenDirty = true;
         }
         controlChannelValue = newControlChannelValue;

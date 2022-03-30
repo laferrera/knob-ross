@@ -62,8 +62,10 @@
 #define GEM_KEY_LEFT 4    // Left key is pressed (navigate through the Back button to the previous menu page, select previous digit/char of editable variable)
 #define GEM_KEY_CANCEL 5  // Cancel key is pressed (navigate to the previous (parent) menu page, exit edit mode without saving the variable, exit context loop if allowed within context's settings)
 #define GEM_KEY_OK 6      // Ok/Apply key is pressed (toggle boolean menu item, enter edit mode of the associated non-boolean variable, exit edit mode with saving the variable, execute code associated with button)
+#define GEM_KEY_BIG_UP 7  // what am i even doing?
+#define GEM_KEY_BIG_DOWN 8 // big up / big down for big increments
 
-    // Declaration of Splash type
+// Declaration of Splash type
 struct Splash {
   byte width;             // Width of the splash lmage
   byte height;            // Height of the splash image
@@ -215,8 +217,8 @@ class GEM_adafruit_gfx {
     void prevEditValueSelect();
     void drawEditValueSelect();
 
-    void nextEditValueFloat();
-    void prevEditValueFloat();
+    void nextEditValueFloat(float increment);
+    void prevEditValueFloat(float decrement);
     void drawEditValueFloat();
 
     void saveEditValue();

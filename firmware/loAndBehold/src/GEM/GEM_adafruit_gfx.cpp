@@ -750,19 +750,23 @@ void GEM_adafruit_gfx::drawEditValueSelect() {
 // trying to figure out how to do this with floats...
 
 
-void GEM_adafruit_gfx::nextEditValueFloat() {
+void GEM_adafruit_gfx::nextEditValueFloat(float increment) {
   GEMItem* menuItemTmp = _menuPageCurrent->getCurrentMenuItem();
   float curVal = atof(_valueString);
-  if (curVal < menuItemTmp->max) {
-    curVal += 0.01;
+  if ((curVal + increment) < menuItemTmp->max) {
+    curVal += increment;
   }
   dtostrf(curVal, menuItemTmp->precision + 1, menuItemTmp->precision, _valueString);
   drawEditValueFloat();
 }
 
-void GEM_adafruit_gfx::prevEditValueFloat() {
+void GEM_adafruit_gfx::prevEditValueFloat(float decrement) {
   GEMItem* menuItemTmp = _menuPageCurrent->getCurrentMenuItem();
-  dtostrf((atof(_valueString) - 0.1f), menuItemTmp->precision + 1, menuItemTmp->precision, _valueString);
+  float curVal = atof(_valueString);
+  if ((curVal - decrement) > menuItemTmp->min) {
+    curVal -= decrement;
+  }
+  dtostrf(curVal, menuItemTmp->precision + 1, menuItemTmp->precision, _valueString);
   drawEditValueFloat();
 }
 
@@ -898,9 +902,14 @@ void GEM_adafruit_gfx::dispatchKeyPress() {
           if (_editValueType == GEM_VAL_SELECT) {
             prevEditValueSelect();
           } else if (_editValueType == GEM_VAL_FLOAT) {
-            prevEditValueFloat();
+            prevEditValueFloat(0.1f);
           } else {
             nextEditValueDigit();
+          }
+          break;
+        case GEM_KEY_BIG_UP:
+          if (_editValueType == GEM_VAL_FLOAT) {
+            prevEditValueFloat(1.0f);
           }
           break;
         case GEM_KEY_RIGHT:
@@ -912,9 +921,14 @@ void GEM_adafruit_gfx::dispatchKeyPress() {
           if (_editValueType == GEM_VAL_SELECT) {
             nextEditValueSelect();
           } else if (_editValueType == GEM_VAL_FLOAT) {
-            nextEditValueFloat();
+            nextEditValueFloat(0.1);
           } else {
             prevEditValueDigit();
+          }
+          break;
+        case GEM_KEY_BIG_DOWN:
+          if (_editValueType == GEM_VAL_FLOAT) {
+            nextEditValueFloat(1.0f);
           }
           break;
         case GEM_KEY_LEFT:
