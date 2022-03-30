@@ -78,21 +78,16 @@ void dirtyChannel(int chIndex) {
   // if channel destination is self, set output destination to bus, hide the channels outputDest menu item
   if (ch->channelDestinationIndex == chIndex) {
     ch->outputDestination = OUT_BUS;
-    Serial.println("where are we ? channel: " + String(channelPageItems[chIndex][0]->getTitle()));
-    Serial.println("where are we 2?: " + String(channelPageItems[chIndex][7]->getTitle()));
-    if(ch->lfoFreqBPM == LFO_FREQ) {
-      channelPageItems[chIndex][7]->hide(false);
-      channelPageItems[chIndex][8]->hide(true);
-      channelPageItems[chIndex][9]->hide(true);
-    } else {
-      channelPageItems[chIndex][7]->hide(true);
-      channelPageItems[chIndex][8]->hide(false);
-      channelPageItems[chIndex][9]->hide(false);
-      
-    }
   }
-
-
+  if (ch->lfoFreqBPM == LFO_FREQ) {
+    channelPageItems[chIndex][7]->hide(false);
+    channelPageItems[chIndex][8]->hide(true);
+    channelPageItems[chIndex][9]->hide(true);
+  } else {
+    channelPageItems[chIndex][7]->hide(true);
+    channelPageItems[chIndex][8]->hide(false);
+    channelPageItems[chIndex][9]->hide(false);
+  }
 }
 
 void dirtyChannel0(){dirtyChannel(0);};
@@ -262,7 +257,7 @@ void setupChannelMenus(){
     channelsMenuPage.addMenuItem(*channelPageLink);
     channelPage->setParentMenuPage(channelsMenuPage);
     channelPageItems.push_back(channelItemHolder);
-    // channelFreq->hide(true);
+    dirtyChannelFunctions[i]();
   }
 }
 
