@@ -1,7 +1,7 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
-#define NUM_OF_CHANNELS 1
+#define NUM_OF_CHANNELS 8
 // #define SAMPLERATE 10000.0f
 #define SAMPLERATE 100.0f
 #define SCREEN_SAVER_TIMEOUT_MS 200000

@@ -83,6 +83,7 @@ void dirtyChannel(int chIndex) {
     ch->outputDestination = OUT_BUS;
     channelPageItems[chIndex][7].hide(true);
     channelPageItems[chIndex][7].setReadonly(true);
+    // channelPages[chIndex].addMenuItem(channelPageItems[chIndex][7]);
     Serial.println("is it hidden?: " + String(channelPageItems[chIndex][7].getHidden()));
   } else {
     channelPageItems[chIndex][7].hide(false);
@@ -218,7 +219,7 @@ void setupChannelMenus(){
     channelItemHolder.push_back(*channelFreqBPM);
     // channelItemHolder 7  is lfo freq
     GEMItem *channelFreq = new GEMItem(FreqItemStr, channels[i]->lfoFreq, dirtyChannelFunctions[i], FREQ_MIN, FREQ_MAX);
-    channelFreq->hide(true);
+    // channelFreq->hide(true);
     channelItemHolder.push_back(*channelFreq);
     // channelItemHolder 8  is beat numerator
     GEMItem *channelLfoBeatNumerator = new GEMItem(lfoBeatNumItemStr, channels[i]->lfoBeatNumerator, lfoBeatSelect, dirtyChannelFunctions[i]);
