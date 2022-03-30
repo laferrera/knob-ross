@@ -71,8 +71,6 @@ void loop() {
   buttonCancel.update();
   buttonOkay.update();
 
-
-
   if (buttonCancel.pressed()) {
     screenSaver = false;
     ellapsedTouchMillis = 0;
@@ -202,14 +200,13 @@ void loop() {
 
   // screen cycle
   if (screenDirty && !screenSaver && (ellapsedDisplayMillis > screenStepTime)) {
-    // update display
-    // Serial.println("updating display");
-    if(curMode == MAIN_MENU){
+    if (curMode == MAIN_MENU) {
+      // TODO - why is this weird?
       // menu.drawMenu();
     }
-    ellapsedDisplayMillis = ellapsedDisplayMillis - screenStepTime;
     display.display();
     screenDirty = false;
+    ellapsedDisplayMillis = ellapsedDisplayMillis - screenStepTime;
   }
 
   // lfo cycle - do this at Samplerate -- 1 kHz = 1000 µs
@@ -345,8 +342,13 @@ void loop() {
         }
       }
       if (ch == 'h') {
+        bool hidden = hiddenMenuItem.getHidden();
+        hiddenMenuItem.hide(!hidden);
+        Serial.println("Hidden menu item is now hidden?: " + String(hiddenMenuItem.getHidden()));
         Serial.println("redrawing menu");
+        menu.reInit();
         menu.drawMenu();
+        display.display();
       }
     }
   }

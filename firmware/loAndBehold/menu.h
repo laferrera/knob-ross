@@ -7,6 +7,10 @@
 #include <string>
 #include "tempo.h"
 
+const char *hideMenuStr = "HIDDEN";
+void setModeToPerformance();
+GEMItem hiddenMenuItem(hideMenuStr, setModeToPerformance);
+
 const char *channelStr = "Channel";
 const char *mainMenuStr = "Main Menu";
 const char *performanceMenuStr = "Twist";
@@ -74,14 +78,14 @@ void dirtyChannel(int chIndex) {
   // if channel destination is self, set output destination to bus, hide the channels outputDest menu item
   if (ch->channelDestinationIndex == chIndex) {
     Serial.println("where are we ? channel: " + String(channelPageItems[chIndex][0].getTitle()));
-    Serial.println("where are we 2?: " + String(channelPageItems[chIndex][6].getTitle()));
+    Serial.println("where are we 2?: " + String(channelPageItems[chIndex][7].getTitle()));
     Serial.println("output destination: " + String(channels[chIndex]->outputDestination));
     ch->outputDestination = OUT_BUS;
-    channelPageItems[chIndex][6].hide(true);
-    screenDirty = true;
-    Serial.println("is it hidden?: " + String(channelPageItems[chIndex][6].getHidden()));
+    channelPageItems[chIndex][7].hide(true);
+    channelPageItems[chIndex][7].setReadonly(true);
+    Serial.println("is it hidden?: " + String(channelPageItems[chIndex][7].getHidden()));
   } else {
-    // channelPageItems[chIndex][6].hide(false);
+    channelPageItems[chIndex][7].hide(false);
   }
 
 
@@ -171,6 +175,7 @@ void setupMainMenu() {
   mainMenuPage.addMenuItem(channelsMenuLink);
   mainMenuPage.addMenuItem(performanceMenuItemButton);
   mainMenuPage.addMenuItem(tempoMenuLink);
+  mainMenuPage.addMenuItem(hiddenMenuItem);
   // mainMenuPage.addMenuItem(learnMenuLink);
   // mainMenuPage.addMenuItem(globalMenuLink);
   // mainMenuPage.addMenuItem(twoHeadedMonsterMenuLink);
@@ -189,46 +194,49 @@ void setupChannelMenus(){
     channelPages.push_back(*channelPage);
     GEMItem *channelPageLink = new GEMItem(thisChannelStr, channelPage);
 
-    // channelItemHolder 0  is encoder dest
+    // channelItemHolder 0  is page link
+    channelItemHolder.push_back(*channelPageLink);
+    // channelItemHolder 1  is encoder dest
     GEMItem *encoderDestination = new GEMItem(knobItemStr, channels[i]->encoderDestination, encoderSelect);
     channelItemHolder.push_back(*encoderDestination);
     // not sure why, but adding a callback fixed a crash....
-    // channelItemHolder 1  is channel dest
+    // channelItemHolder 2  is channel dest
     GEMItem *channelDestination = new GEMItem(channelItemStr, channels[i]->channelDestinationIndex, channelSelect, dirtyChannelFunctions[i]);
     channelItemHolder.push_back(*channelDestination);
-    // channelItemHolder 2  is output dest
+    // channelItemHolder 3  is output dest
     GEMItem *outputDestination = new GEMItem(outputItemStr, channels[i]->outputDestination, outputDestinationSelect);
     channelItemHolder.push_back(*outputDestination);
-    // channelItemHolder 3  is waveform
+    // channelItemHolder 4  is waveform
     GEMItem *channelWave = new GEMItem(waveformItemStr, channels[i]->lfoWave, waveSelect, dirtyChannelFunctions[i]);
     channelItemHolder.push_back(*channelWave);
-    // channelItemHolder 4  is lfo amp
+    // channelItemHolder 5  is lfo amp
     GEMItem *channelAmp = new GEMItem(AmpItemStr, channels[i]->lfoAmp, negOneToOneSelect, dirtyChannelFunctions[i]);
     channelItemHolder.push_back(*channelAmp);
 
-    // channelItemHolder 5  is freq/bpm
+    // channelItemHolder 6  is freq/bpm
     GEMItem *channelFreqBPM = new GEMItem(FreqBPMItemStr, channels[i]->lfoFreqBPM, freqBPMSelect, dirtyChannelFunctions[i]);
     channelItemHolder.push_back(*channelFreqBPM);
-    // channelItemHolder 6  is lfo freq
+    // channelItemHolder 7  is lfo freq
     GEMItem *channelFreq = new GEMItem(FreqItemStr, channels[i]->lfoFreq, dirtyChannelFunctions[i], FREQ_MIN, FREQ_MAX);
+    channelFreq->hide(true);
     channelItemHolder.push_back(*channelFreq);
-    // channelItemHolder 7  is beat numerator
+    // channelItemHolder 8  is beat numerator
     GEMItem *channelLfoBeatNumerator = new GEMItem(lfoBeatNumItemStr, channels[i]->lfoBeatNumerator, lfoBeatSelect, dirtyChannelFunctions[i]);
     channelItemHolder.push_back(*channelLfoBeatNumerator);
-    // channelItemHolder 8  is beat denominator
+    // channelItemHolder 9  is beat denominator
     GEMItem *channelLfoBeatDenominator = new GEMItem(lfoBeatDenomItemStr, channels[i]->lfoBeatDenominator, lfoBeatSelect, dirtyChannelFunctions[i]);
     channelItemHolder.push_back(*channelLfoBeatDenominator);
 
-    // channelItemHolder 9  is midi CC
+    // channelItemHolder 10  is midi CC
     GEMItem *channelCC = new GEMItem(CCItemStr, channels[i]->cc, midiCCSelect);
     channelItemHolder.push_back(*channelCC);
-    // channelItemHolder 10  is phase
+    // channelItemHolder 11  is phase
     GEMItem *channelPhase = new GEMItem(phaseItemStr, channels[i]->phase, oneTwoEightSelect);
     channelItemHolder.push_back(*channelPhase);
-    // channelItemHolder 11  is clip mode
+    // channelItemHolder 12  is clip mode
     GEMItem *clipMode = new GEMItem(clipItemStr, channels[i]->clipMode, clipModeSelect);
     channelItemHolder.push_back(*clipMode);
-    // channelItemHolder 12  is lfo offset
+    // channelItemHolder 13  is lfo offset
     GEMItem *lfoAmpOffset = new GEMItem(lfoAmpOffsetItemStr, channels[i]->lfoAmpOffset, negOneToOneSelect);
     channelItemHolder.push_back(*lfoAmpOffset);
 
