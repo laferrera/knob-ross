@@ -59,7 +59,7 @@ const char* channelStrings[] = {channel1Str, channel2Str, channel3Str, channel4S
 
 std::vector<GEMPage> pages;
 std::vector<GEMPage> channelPages;
-std::vector<std::vector <GEMItem>> channelPageItems;
+std::vector<std::vector <GEMItem*>> channelPageItems;
 std::vector<std::vector<GEMItem>> channelPageLinks;
 // TODO make arrays or vectors for the different channelMenuItems 
 
@@ -77,16 +77,19 @@ void dirtyChannel(int chIndex) {
   ch->lfo->SetWaveform(ch->lfoWave);
   // if channel destination is self, set output destination to bus, hide the channels outputDest menu item
   if (ch->channelDestinationIndex == chIndex) {
-    Serial.println("where are we ? channel: " + String(channelPageItems[chIndex][0].getTitle()));
-    Serial.println("where are we 2?: " + String(channelPageItems[chIndex][7].getTitle()));
-    Serial.println("output destination: " + String(channels[chIndex]->outputDestination));
     ch->outputDestination = OUT_BUS;
-    channelPageItems[chIndex][7].hide(true);
-    channelPageItems[chIndex][7].setReadonly(true);
-    // channelPages[chIndex].addMenuItem(channelPageItems[chIndex][7]);
-    Serial.println("is it hidden?: " + String(channelPageItems[chIndex][7].getHidden()));
-  } else {
-    channelPageItems[chIndex][7].hide(false);
+    Serial.println("where are we ? channel: " + String(channelPageItems[chIndex][0]->getTitle()));
+    Serial.println("where are we 2?: " + String(channelPageItems[chIndex][7]->getTitle()));
+    if(ch->lfoFreqBPM == LFO_FREQ) {
+      channelPageItems[chIndex][7]->hide(false);
+      channelPageItems[chIndex][8]->hide(true);
+      channelPageItems[chIndex][9]->hide(true);
+    } else {
+      channelPageItems[chIndex][7]->hide(true);
+      channelPageItems[chIndex][8]->hide(false);
+      channelPageItems[chIndex][9]->hide(false);
+      
+    }
   }
 
 
@@ -188,7 +191,7 @@ void setupMainMenu() {
 
 void setupChannelMenus(){
   for (int i = 0; i < NUM_OF_CHANNELS; i++) {
-    std::vector<GEMItem> channelItemHolder;
+    std::vector<GEMItem*> channelItemHolder;
 
     const char *thisChannelStr = channelStrings[i];
     GEMPage *channelPage = new GEMPage(thisChannelStr);
@@ -196,50 +199,50 @@ void setupChannelMenus(){
     GEMItem *channelPageLink = new GEMItem(thisChannelStr, channelPage);
 
     // channelItemHolder 0  is page link
-    channelItemHolder.push_back(*channelPageLink);
+    channelItemHolder.push_back(channelPageLink);
     // channelItemHolder 1  is encoder dest
     GEMItem *encoderDestination = new GEMItem(knobItemStr, channels[i]->encoderDestination, encoderSelect);
-    channelItemHolder.push_back(*encoderDestination);
+    channelItemHolder.push_back(encoderDestination);
     // not sure why, but adding a callback fixed a crash....
     // channelItemHolder 2  is channel dest
     GEMItem *channelDestination = new GEMItem(channelItemStr, channels[i]->channelDestinationIndex, channelSelect, dirtyChannelFunctions[i]);
-    channelItemHolder.push_back(*channelDestination);
+    channelItemHolder.push_back(channelDestination);
     // channelItemHolder 3  is output dest
     GEMItem *outputDestination = new GEMItem(outputItemStr, channels[i]->outputDestination, outputDestinationSelect);
-    channelItemHolder.push_back(*outputDestination);
+    channelItemHolder.push_back(outputDestination);
     // channelItemHolder 4  is waveform
     GEMItem *channelWave = new GEMItem(waveformItemStr, channels[i]->lfoWave, waveSelect, dirtyChannelFunctions[i]);
-    channelItemHolder.push_back(*channelWave);
+    channelItemHolder.push_back(channelWave);
     // channelItemHolder 5  is lfo amp
     GEMItem *channelAmp = new GEMItem(AmpItemStr, channels[i]->lfoAmp, negOneToOneSelect, dirtyChannelFunctions[i]);
-    channelItemHolder.push_back(*channelAmp);
+    channelItemHolder.push_back(channelAmp);
 
     // channelItemHolder 6  is freq/bpm
     GEMItem *channelFreqBPM = new GEMItem(FreqBPMItemStr, channels[i]->lfoFreqBPM, freqBPMSelect, dirtyChannelFunctions[i]);
-    channelItemHolder.push_back(*channelFreqBPM);
+    channelItemHolder.push_back(channelFreqBPM);
     // channelItemHolder 7  is lfo freq
     GEMItem *channelFreq = new GEMItem(FreqItemStr, channels[i]->lfoFreq, dirtyChannelFunctions[i], FREQ_MIN, FREQ_MAX);
     // channelFreq->hide(true);
-    channelItemHolder.push_back(*channelFreq);
+    channelItemHolder.push_back(channelFreq);
     // channelItemHolder 8  is beat numerator
     GEMItem *channelLfoBeatNumerator = new GEMItem(lfoBeatNumItemStr, channels[i]->lfoBeatNumerator, lfoBeatSelect, dirtyChannelFunctions[i]);
-    channelItemHolder.push_back(*channelLfoBeatNumerator);
+    channelItemHolder.push_back(channelLfoBeatNumerator);
     // channelItemHolder 9  is beat denominator
     GEMItem *channelLfoBeatDenominator = new GEMItem(lfoBeatDenomItemStr, channels[i]->lfoBeatDenominator, lfoBeatSelect, dirtyChannelFunctions[i]);
-    channelItemHolder.push_back(*channelLfoBeatDenominator);
+    channelItemHolder.push_back(channelLfoBeatDenominator);
 
     // channelItemHolder 10  is midi CC
     GEMItem *channelCC = new GEMItem(CCItemStr, channels[i]->cc, midiCCSelect);
-    channelItemHolder.push_back(*channelCC);
+    channelItemHolder.push_back(channelCC);
     // channelItemHolder 11  is phase
     GEMItem *channelPhase = new GEMItem(phaseItemStr, channels[i]->phase, oneTwoEightSelect);
-    channelItemHolder.push_back(*channelPhase);
+    channelItemHolder.push_back(channelPhase);
     // channelItemHolder 12  is clip mode
     GEMItem *clipMode = new GEMItem(clipItemStr, channels[i]->clipMode, clipModeSelect);
-    channelItemHolder.push_back(*clipMode);
+    channelItemHolder.push_back(clipMode);
     // channelItemHolder 13  is lfo offset
     GEMItem *lfoAmpOffset = new GEMItem(lfoAmpOffsetItemStr, channels[i]->lfoAmpOffset, negOneToOneSelect);
-    channelItemHolder.push_back(*lfoAmpOffset);
+    channelItemHolder.push_back(lfoAmpOffset);
 
     channelPage->addMenuItem(*channelWave);
     channelPage->addMenuItem(*lfoAmpOffset);
@@ -259,6 +262,7 @@ void setupChannelMenus(){
     channelsMenuPage.addMenuItem(*channelPageLink);
     channelPage->setParentMenuPage(channelsMenuPage);
     channelPageItems.push_back(channelItemHolder);
+    // channelFreq->hide(true);
   }
 }
 
