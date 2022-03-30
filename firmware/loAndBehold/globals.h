@@ -18,6 +18,7 @@
 extern float globalBPM;
 enum modes { MAIN_MENU, PERFORMANCE, CHANNEL, TAP_TEMPO, LEARN, GLOBAL, TWO_HEADED_MONSTER} ;
 extern modes curMode;
+extern bool screenDirty;
 
 enum encoderDestinations {ENC_AMP, ENC_FREQ, ENC_WAVEFORM, ENC_OFFSET};
 enum outputDestinations {OUT_BUS, OUT_AMP, OUT_FREQ, OUT_WAVEFORM, OUT_OFFSET, OUT_MIDI};

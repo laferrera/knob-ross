@@ -13,7 +13,7 @@ int encoderSens = 1;
 int ledState = HIGH;
 Metro ledMetro = Metro(250);
 Tempo tempo;
-modes curMode = PERFORMANCE;
+modes curMode = MAIN_MENU;
 
 #define MIDI_CHANNEL 1
 
@@ -32,7 +32,7 @@ uint32_t screenStepTime = 6; // ~15fps
 uint32_t channelCalcStepTime = 7;
 // uint32_t midiSendStepTime = 13; 
 uint32_t metroStepTime = 11; //
-int lfoStepTime = int(SAMPLERATE * 1000.0 / 16); // 25000 microseconds
+uint32_t lfoStepTime = uint32_t(SAMPLERATE * 1000.0 / 16); // 25000 microseconds
 // int lfoStepTime  = 25000;
 
 void setup() {
@@ -204,8 +204,12 @@ void loop() {
   if (screenDirty && !screenSaver && (ellapsedDisplayMillis > screenStepTime)) {
     // update display
     // Serial.println("updating display");
+    if(curMode == MAIN_MENU){
+      // menu.drawMenu();
+    }
     ellapsedDisplayMillis = ellapsedDisplayMillis - screenStepTime;
     display.display();
+    screenDirty = false;
   }
 
   // lfo cycle - do this at Samplerate -- 1 kHz = 1000 µs
@@ -240,7 +244,6 @@ void loop() {
 
     // screensaver cycle
     if (!screenSaver && (ellapsedTouchMillis > SCREEN_SAVER_TIMEOUT_MS)) {
-      // update display
       screenSaver = true;
       display.fillScreen(SSD1306_BLACK);
       display.display();
@@ -262,10 +265,6 @@ void loop() {
       // tempoMenu.drawMenu();
       // screenDirty = true;
     }
-
-    // if (CrashReport && Serial) {
-    //   Serial.print(CrashReport);
-    // }
 
     if (Serial.available()) {
 
@@ -344,6 +343,10 @@ void loop() {
         if (CrashReport) {
           Serial.print(CrashReport);
         }
+      }
+      if (ch == 'h') {
+        Serial.println("redrawing menu");
+        menu.drawMenu();
       }
     }
   }
