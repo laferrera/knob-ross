@@ -27,6 +27,7 @@ class Oscillator
         WAVE_SQUARE,
         WAVE_SMOOTH,
         WAVE_RANDOM,
+        WAVE_CLOCK,
         WAVE_POLYBLEP_TRI,
         WAVE_POLYBLEP_SAW,
         WAVE_POLYBLEP_SQUARE,

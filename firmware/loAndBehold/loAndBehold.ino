@@ -7,16 +7,13 @@
 #include "controls.h"
 #include "tempo.h"
 #include "menu.h"
-// #include "lfo.h"
-// #include "globals.h"
-
 
 #define LED 13
 int encoderSens = 1;
 int ledState = HIGH;
 Metro ledMetro = Metro(250);
 Tempo tempo;
-modes curMode = TAP_TEMPO;
+modes curMode = PERFORMANCE;
 
 #define MIDI_CHANNEL 1
 
@@ -35,7 +32,8 @@ uint32_t screenStepTime = 6; // ~15fps
 uint32_t channelCalcStepTime = 7;
 // uint32_t midiSendStepTime = 13; 
 uint32_t metroStepTime = 11; //
-uint32_t lfoStepTime = 100;  // 100 microseconds is 10khz
+int lfoStepTime = int(SAMPLERATE * 1000.0 / 16); // 25000 microseconds
+// int lfoStepTime  = 25000;
 
 void setup() {
   Serial.begin(38400);
@@ -115,10 +113,10 @@ void loop() {
   }
 
   long newControlChannelValue = controlChannel.read();
-  if ((newControlChannelValue != controlChannelValue) && (abs(newControlChannelValue - controlChannelValue) > encoderSens)) {
+  int encDelta = abs(newControlChannelValue - controlChannelValue);
+  if ((newControlChannelValue != controlChannelValue) && (encDelta > encoderSens)) {
     screenSaver = false;
     ellapsedTouchMillis = 0;
-    // if (newControlChannelValue != controlChannelValue) {
     if (curMode == MAIN_MENU) {
         if (newControlChannelValue > controlChannelValue) {
           menu.registerKeyPress(GEM_KEY_DOWN);
@@ -135,8 +133,8 @@ void loop() {
         curGraphIndex = (curGraphIndex - 1) % NUM_OF_CHANNELS;
         if (curGraphIndex < 0) { curGraphIndex = NUM_OF_CHANNELS - 1;}
       }
-        controlChannelValue = newControlChannelValue;
-      }
+    }
+    controlChannelValue = newControlChannelValue;
   }
 
   for (int i = 0; i < NUM_OF_CHANNELS; i++) {
@@ -178,7 +176,6 @@ void loop() {
               }
             }
           newSetting = constrain(newSetting, .001f, 100.0f);
-          Serial.println("setting channel lfo freq to: " + String(newSetting, 3));
           channels[i]->lfoFreq = newSetting;
           channels[i]->lfo->SetFreq(channels[i]->lfoFreq);
           break;
@@ -203,9 +200,11 @@ void loop() {
     display.display();
   }
 
-  // lfo cycle - do this at 10khz
+  // lfo cycle - do this at Samplerate -- 1 kHz = 1000 µs
   if (ellapsedLfoMicros > lfoStepTime) {
+    // Serial.println("ellapsedLfoMicros: " + String(ellapsedLfoMicros));
     ellapsedLfoMicros = ellapsedLfoMicros - lfoStepTime;
+    // ellapsedLfoMicros = 0;
     processLfos();
   }
 

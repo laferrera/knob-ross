@@ -85,6 +85,41 @@ GEMItem::GEMItem(const char* title_, double& linkedVariable_, GEMSelect& select_
 
 //---
 
+GEMItem::GEMItem(const char* title_, int& linkedVariable_, GEMSelect& select_, void (*saveAction_)(), int min_, int max_)
+  : title(title_)
+  , linkedVariable(&linkedVariable_)
+  , linkedType(GEM_VAL_SELECT)
+  , type(GEM_ITEM_VAL)
+  , select(&select_)
+  , saveAction(saveAction_)
+  , min(min_)
+  , max(max_)
+{ }
+
+GEMItem::GEMItem(const char* title_, float& linkedVariable_, GEMSelect& select_, void (*saveAction_)(), int min_, int max_)
+  : title(title_)
+  , linkedVariable(&linkedVariable_)
+  , linkedType(GEM_VAL_SELECT)
+  , type(GEM_ITEM_VAL)
+  , select(&select_)
+  , saveAction(saveAction_)
+  , min(min_)
+  , max(max_)
+{ }
+
+GEMItem::GEMItem(const char* title_, double& linkedVariable_, GEMSelect& select_, void (*saveAction_)(), int min_, int max_)
+  : title(title_)
+  , linkedVariable(&linkedVariable_)
+  , linkedType(GEM_VAL_SELECT)
+  , type(GEM_ITEM_VAL)
+  , select(&select_)
+  , saveAction(saveAction_)
+  , min(min_)
+  , max(max_)
+{ }
+
+//---
+
 GEMItem::GEMItem(const char* title_, byte& linkedVariable_, GEMSelect& select_, boolean readonly_)
   : title(title_)
   , linkedVariable(&linkedVariable_)
@@ -179,6 +214,37 @@ GEMItem::GEMItem(const char* title_, double& linkedVariable_, void (*saveAction_
   , linkedType(GEM_VAL_DOUBLE)
   , type(GEM_ITEM_VAL)
   , precision(GEM_DOUBLE_PREC)
+  , saveAction(saveAction_)
+{ }
+
+//---
+GEMItem::GEMItem(const char *title_, int &linkedVariable_, void (*saveAction_)(), int min, int max_)
+  : title(title_)
+  , linkedVariable(&linkedVariable_)
+  , linkedType(GEM_VAL_INTEGER)
+  , type(GEM_ITEM_VAL)
+  , min(min)
+  , max(max_)
+  , saveAction(saveAction_)
+{ }
+
+GEMItem::GEMItem(const char *title_, float &linkedVariable_, void (*saveAction_)(), int min, int max_)
+  : title(title_)
+  , linkedVariable(&linkedVariable_)
+  , linkedType(GEM_VAL_FLOAT)
+  , type(GEM_ITEM_VAL)
+  , min(min)
+  , max(max_)
+  , saveAction(saveAction_)
+{ }
+
+GEMItem::GEMItem(const char *title_, double &linkedVariable_, void (*saveAction_)(), int min, int max_)
+  : title(title_)
+  , linkedVariable(&linkedVariable_)
+  , linkedType(GEM_VAL_DOUBLE)
+  , type(GEM_ITEM_VAL)
+  , min(min)
+  , max(max_)
   , saveAction(saveAction_)
 { }
 

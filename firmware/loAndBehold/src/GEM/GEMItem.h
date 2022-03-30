@@ -75,6 +75,18 @@ class GEMItem {
     GEMItem(const char* title_, char* linkedVariable_, GEMSelect& select_, void (*saveAction_)());
     GEMItem(const char* title_, float& linkedVariable_, GEMSelect& select_, void (*saveAction_)());
     GEMItem(const char* title_, double& linkedVariable_, GEMSelect& select_, void (*saveAction_)());
+        /* 
+      Constructors for menu item that represents option select, w/ callback and min and max values
+      @param 'title_' - title of the menu item displayed on the screen
+      @param 'linkedVariable_' - reference to variable that menu item is associated with (either byte, int, char*, float, or double)
+      @param 'select_' - reference to GEMSelect option select
+      @param 'saveAction_' - pointer to callback function executed when associated variable is successfully saved
+      @param 'min' - smallest value
+      @param 'max' - largest value
+    */
+    GEMItem(const char* title_, int& linkedVariable_, GEMSelect& select_, void (*saveAction_)(), int min_, int max_);
+    GEMItem(const char* title_, float& linkedVariable_, GEMSelect& select_, void (*saveAction_)(), int min_, int max_);
+    GEMItem(const char *title_, double &linkedVariable_, GEMSelect &select_, void (*saveAction_)(), int min_, int max_);
     /* 
       Constructors for menu item that represents option select, w/o callback
       @param 'title_' - title of the menu item displayed on the screen
@@ -101,6 +113,18 @@ class GEMItem {
     GEMItem(const char* title_, boolean& linkedVariable_, void (*saveAction_)());
     GEMItem(const char* title_, float& linkedVariable_, void (*saveAction_)());
     GEMItem(const char* title_, double& linkedVariable_, void (*saveAction_)());
+            /* 
+      Constructors for menu item that represents option select, w/ callback and min and max values
+      @param 'title_' - title of the menu item displayed on the screen
+      @param 'linkedVariable_' - reference to variable that menu item is associated with (either byte, int, char*, float, or double)
+      @param 'select_' - reference to GEMSelect option select
+      @param 'saveAction_' - pointer to callback function executed when associated variable is successfully saved
+      @param 'min' - smallest value
+      @param 'max' - largest value
+    */
+    GEMItem(const char* title_, int& linkedVariable_, void (*saveAction_)(), int min, int max_);
+    GEMItem(const char* title_, float& linkedVariable_, void (*saveAction_)(), int min, int max_);
+    GEMItem(const char *title_, double &linkedVariable_, void (*saveAction_)(), int min, int max_);
     /* 
       Constructors for menu item that represents variable, w/o callback
       @param 'title_' - title of the menu item displayed on the screen
@@ -165,6 +189,8 @@ class GEMItem {
     GEMItem* menuItemNext = nullptr;
     void (*buttonAction)();
     void (*saveAction)();
+    int min;
+    int max;
     GEMItem* getMenuItemNext();             // Get next menu item, excluding hidden ones
 };
   

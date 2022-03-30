@@ -45,21 +45,21 @@ struct Channel {
   uint8_t index;
   float outputValue;            // -1 to 1
   long encoderValue;            // -infinity to +infinity
-  int cc;                   // 102 -128 ?
+  int cc;                       // 102 -128 ?
   int phase;                    // i think this is -π to +π
-  int clipMode;                    
-  int lfoWave;              // 0 - 6 for lfo wave
+  int clipMode;                 // hard clip, bounce, or scale   
+  int lfoWave;                  // 0 - ? for lfo wave
   float lfoAmp;                 // -1 to 1
   float lfoAmpOffset;           // -1 to 1 - this shifts the lfo output wave up or down
-  bool lfoFreqBPM;              // true | false / either BPM or Hz
+  int lfoFreqBPM;               // 0 | 1 / either BPM or Hz
   float lfoFreq;                // hz 0.001 - 50hz..... 16 minutes to 20ms
-  int lfoFreqBeatType;          // bar, 1/2, 1/4, 1/8, 1/16, 1/32, 1/64
-  uint8_t lfoFreqBeatAmount;    // 1-32 beats
+  int lfoBeatNumerator;         // 1-32 beats
+  int lfoBeatDenominator;       // bar, 1/2, 1/4, 1/8, 1/16, 1/32, 1/64
+
   int lfoFreqBeatOffset;        // 1/64 - 1/32 - 1/16 - 1/8 - 1/4 - 1/2 - look at this how Reason does this...
-  int encoderDestination;   // i.e. channel controls value / lfo amp / lfo freq / lfo offset / wave
-  int channelDestinationIndex; // which channel id does the lfo control?
-  // Channel * channelDestination; // which channel does the lfo control?
-  uint8_t outputDestination;    // which param on channel above does the channel control? value / amp / freq / offset / wave
+  int encoderDestination;       // i.e. knob controls value / lfo amp / lfo freq / lfo offset / wave
+  int channelDestinationIndex;  // which channel id does the lfo control?
+  uint8_t outputDestination;    // which param on channel above does the channel bus control? value / amp / freq / offset / wave
   daisysp::Oscillator *lfo;
   // lfo param? i.e. pulsewidth
 };
@@ -94,10 +94,12 @@ void initializeChannels(void){
     channel.cc = 102 + i;
     channel.phase = 0;
     channel.clipMode = CLIP_HARD;
-    // channel.clipMode = CLIP_BOUNCE;
-    channel.lfoFreq = 50.f;
+    channel.lfoFreqBPM = LFO_FREQ;
+    channel.lfoFreq = 0.5f + i * 0.9f;
+    channel.lfoBeatNumerator = 1;
+    channel.lfoBeatDenominator = 4;
     channel.lfoAmp = 0.75f;
-    channel.lfoWave = i % 5;
+    channel.lfoWave = i % 5 + 1;
     channel.lfoAmpOffset = 0;
     channel.channelDestinationIndex = i;
     // channel.channelDestination = &channel;

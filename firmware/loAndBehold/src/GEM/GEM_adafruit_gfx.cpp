@@ -752,7 +752,11 @@ void GEM_adafruit_gfx::drawEditValueSelect() {
 
 void GEM_adafruit_gfx::nextEditValueFloat() {
   GEMItem* menuItemTmp = _menuPageCurrent->getCurrentMenuItem();
-  dtostrf((atof(_valueString) + 0.1f), menuItemTmp->precision + 1, menuItemTmp->precision, _valueString);
+  float curVal = atof(_valueString);
+  if (curVal < menuItemTmp->max) {
+    curVal += 0.01;
+  }
+  dtostrf(curVal, menuItemTmp->precision + 1, menuItemTmp->precision, _valueString);
   drawEditValueFloat();
 }
 

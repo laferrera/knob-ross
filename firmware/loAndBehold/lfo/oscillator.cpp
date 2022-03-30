@@ -47,6 +47,9 @@ float Oscillator::Process()
       out = last_out_;
     }
     break;
+  case WAVE_CLOCK:
+    out = eoc_ ? (1.0f) : -1.0f;
+    break;
   case WAVE_POLYBLEP_TRI:
     t = phase_ * TWO_PI_RECIP;
     out = phase_ < PI_F ? 1.0f : -1.0f;
