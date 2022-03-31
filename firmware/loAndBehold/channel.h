@@ -2,6 +2,7 @@
 #ifndef CHANNEL_H
 #define CHANNEL_H
 #include "lfo/oscillator.cpp"
+#include "globals.h"
 
 std::vector<daisysp::Oscillator> oscillators;
 
@@ -27,6 +28,8 @@ struct Channel {
   daisysp::Oscillator *lfo;
   // lfo param? i.e. pulsewidth
 };
+
+// TODO - make these into vectors
 struct Channel channel1, channel2, channel3, channel4, channel5, channel6, channel7, channel8, channel9, channel10, channel11, channel12;
 Channel *channels[12] = {&channel1, &channel2, &channel3, &channel4, &channel5, &channel6, &channel7, &channel8, &channel9, &channel10, &channel11, &channel12};
 

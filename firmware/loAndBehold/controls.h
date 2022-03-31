@@ -11,7 +11,9 @@ float channelAccumulator[] = {0,0,0,0,0,0,0,0};
 int channelScaler[] = {0,0,0,0,0,0,0,0};
 float prevChannelAccumulator[] = {0,0,0,0,0,0,0,0};
 float graphs[NUM_OF_CHANNELS][SCREEN_WIDTH];
-
+int controlChannelValue = 0;
+int buttonCancelPin = 3;
+int buttonOkayPin = 7;
 
 // Encoder enc1(0, 1);
 Encoder enc1(24, 25);
@@ -34,20 +36,9 @@ Encoder enc16(39, 40);
 // Encoder controlChannel(15, 16);
 Encoder controlChannel(10, 11);
 Encoder *encoders[12] = {&enc1, &enc2, &enc3, &enc4, &enc5, &enc6, &enc7, &enc8, &enc9, &enc10, &enc11, &enc12};
-int controlChannelValue = 0;
-int buttonCancelPin = 3; 
-int buttonOkayPin = 7;
+
 Button buttonCancel = Button();
 Button buttonOkay = Button();
-
-// String encoderDestinations[] = {"AMP", "FREQ", "WAVEFORM", "OFFSET"};
-
-
-// std::queue<float> graphQueues[NUM_OF_CHANNELS][128]; 
-// std::array<std::queue<float>, NUM_OF_CHANNELS> graphQueues;
-// std::array<FixedQueue<float, SCREEN_WIDTH>, NUM_OF_CHANNELS> graphQueues;
-
-// TODO - make these into vector
 
 
 void initializeButtons(void){
@@ -59,7 +50,6 @@ void initializeButtons(void){
   buttonOkay.setPressedState(LOW);
 }
 
-// lfo1Out = lfo1.Process(channels[i].lfoWave, channels[i].lfoAmp, channels[i].lfoFreq, channels[i].lfoFreqBeatType, channels[i].lfoFreqBeatAmount, channels[i].lfoFreqBeatOffset);
 void processLfos(void) {
   for (uint8_t i = 0; i < NUM_OF_CHANNELS; i++) {
     // channels[i]->outputValue = channels[i]->lfo->Process();
