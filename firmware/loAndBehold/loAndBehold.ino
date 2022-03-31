@@ -1,4 +1,3 @@
-#include <ArduinoTrace.h>
 #include "globals.h"
 #include <Metro.h>
 #include <algorithm>
@@ -29,11 +28,11 @@ int curGraphIndex = 0;
 bool graphHUD = false;
 
 uint32_t screenStepTime = 6; // ~15fps
-uint32_t channelCalcStepTime = 7;
+uint32_t channelCalcStepTime = 25;
 // uint32_t midiSendStepTime = 13; 
 uint32_t metroStepTime = 11; //
-uint32_t lfoStepTime = uint32_t(SAMPLERATE * 1000.0 / 16); // 25000 microseconds
-// int lfoStepTime  = 25000;
+// uint32_t lfoStepTime = uint32_t(1000000.0f / SAMPLERATE);
+uint32_t lfoStepTime = uint32_t(100000.0f / SAMPLERATE);
 
 void setup() {
   Serial.begin(38400);
@@ -81,6 +80,7 @@ void loop() {
       display.clearDisplay();
       menu.reInit();
       menu.drawMenu();
+      screenDirty = true;
     } else if (curMode == TAP_TEMPO){
       curMode = MAIN_MENU;
       display.clearDisplay();
@@ -205,9 +205,8 @@ void loop() {
   // screen cycle
   if (screenDirty && !screenSaver && (ellapsedDisplayMillis > screenStepTime)) {
     if (curMode == MAIN_MENU) {
-      // TODO - why is this weird?
       // menu.drawMenu();
-    }
+    } 
     display.display();
     screenDirty = false;
     ellapsedDisplayMillis = ellapsedDisplayMillis - screenStepTime;
@@ -215,16 +214,20 @@ void loop() {
 
   // lfo cycle - do this at Samplerate -- 1 kHz = 1000 µs
   if (ellapsedLfoMicros > lfoStepTime) {
-    // Serial.println("ellapsedLfoMicros: " + String(ellapsedLfoMicros));
-    ellapsedLfoMicros = ellapsedLfoMicros - lfoStepTime;
-    // ellapsedLfoMicros = 0;
+    Serial.println("ellapsedLfoMicros: " + String(ellapsedLfoMicros));
     processLfos();
+    // ellapsedLfoMicros = ellapsedLfoMicros - lfoStepTime;
+    ellapsedLfoMicros = 0;
   }
 
   if (ellaspedChannelCalcMillis > channelCalcStepTime) {
     if (curMode == PERFORMANCE) {
       drawGraph(curGraphIndex, graphHUD, channels[curGraphIndex]->lfoFreq);
     }
+    else if (curMode == TAP_TEMPO) {
+      drawTapTempoScreen(tempo.getBPM());
+    }
+    ellaspedChannelCalcMillis = 0;
   }
 
   // metro cycle
@@ -234,14 +237,10 @@ void loop() {
       digitalWrite(LED, ledState);
     }
     // update metro
-    // Serial.println("metro stuff");
     ellapsedMetroMillis = ellapsedMetroMillis - metroStepTime;
   }
 
     // check for incoming midi messages
-
-    // Menu draw
-    // menu.drawMenu();
 
     // screensaver cycle
     if (!screenSaver && (ellapsedTouchMillis > SCREEN_SAVER_TIMEOUT_MS)) {
@@ -249,23 +248,7 @@ void loop() {
       display.fillScreen(SSD1306_BLACK);
       display.display();
       Serial.println("screensaver on ");
-    }
-
-    if (curMode == MAIN_MENU) {
-      //    menu.drawMenu();
-
-    } else if (curMode == PERFORMANCE) {
-      // drawing graph for channel 0
-      
-
-    } else if (curMode == CHANNEL) {
-      // channelMenu.drawMenu();
-      // screenDirty = true;
-    } else if (curMode == TAP_TEMPO) {
-      drawTapTempoScreen(tempo.getBPM());
-      // tempoMenu.drawMenu();
-      // screenDirty = true;
-    }
+    }    
 
     if (Serial.available()) {
 

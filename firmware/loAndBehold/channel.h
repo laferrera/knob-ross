@@ -31,12 +31,28 @@ struct Channel {
 // TODO - make these into vectors
 struct Channel channel1, channel2, channel3, channel4, channel5, channel6, channel7, channel8, channel9, channel10, channel11, channel12;
 Channel *channels[12] = {&channel1, &channel2, &channel3, &channel4, &channel5, &channel6, &channel7, &channel8, &channel9, &channel10, &channel11, &channel12};
+static daisysp::Oscillator *lfo1 = new daisysp::Oscillator;
+static daisysp::Oscillator *lfo2 = new daisysp::Oscillator;
+static daisysp::Oscillator *lfo3 = new daisysp::Oscillator;
+static daisysp::Oscillator *lfo4 = new daisysp::Oscillator;
+static daisysp::Oscillator *lfo5 = new daisysp::Oscillator;
+static daisysp::Oscillator *lfo6 = new daisysp::Oscillator;
+static daisysp::Oscillator *lfo7 = new daisysp::Oscillator;
+static daisysp::Oscillator *lfo8 = new daisysp::Oscillator;
+static daisysp::Oscillator *lfo9 = new daisysp::Oscillator;
+static daisysp::Oscillator *lfo10 = new daisysp::Oscillator;
+static daisysp::Oscillator *lfo11 = new daisysp::Oscillator;
+static daisysp::Oscillator *lfo12 = new daisysp::Oscillator;
+daisysp::Oscillator *lfos[12] = {lfo1, lfo2, lfo3, lfo4, lfo5, lfo6, lfo7, lfo8, lfo9, lfo10, lfo11, lfo12};
+
 
 void initializeChannels(void) {
 
   for (int i = 0; i < NUM_OF_CHANNELS; i++) {
     // static daisysp::Oscillator *lfo = new daisysp::Oscillator;
-    daisysp::Oscillator *lfo = new daisysp::Oscillator;
+    // daisysp::Oscillator *lfo = new daisysp::Oscillator;
+    daisysp::Oscillator *lfo = lfos[i];
+
     oscillators.push_back(*lfo);
     lfo->Init(SAMPLERATE);
     Channel channel;

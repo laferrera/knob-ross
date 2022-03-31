@@ -2,8 +2,13 @@
 #define GLOBALS_H
 
 #define NUM_OF_CHANNELS 8
-// #define SAMPLERATE 10000.0f
-#define SAMPLERATE 100.0f
+#define SAMPLERATE 500.0f
+// freq = 1000000.0 / SAMPLERATE
+// 10000µs for 100hz
+// 2000µs for 500hz
+// 1000µs for 1000hz
+// 200µs for 5000hz
+
 #define SCREEN_SAVER_TIMEOUT_MS 200000
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
