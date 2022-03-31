@@ -26,7 +26,6 @@ struct Channel {
   int channelDestinationIndex; // which channel id does the lfo control?
   uint8_t outputDestination;   // which param on channel above does the channel bus control? value / amp / freq / offset / wave
   daisysp::Oscillator *lfo;
-  // lfo param? i.e. pulsewidth
 };
 
 // TODO - make these into vectors
@@ -34,15 +33,11 @@ struct Channel channel1, channel2, channel3, channel4, channel5, channel6, chann
 Channel *channels[12] = {&channel1, &channel2, &channel3, &channel4, &channel5, &channel6, &channel7, &channel8, &channel9, &channel10, &channel11, &channel12};
 
 void initializeChannels(void) {
-  // initiaize channels, should probably do this for banks.
-  // encoderDestinations ec;
-  // ec = AMP;
 
   for (int i = 0; i < NUM_OF_CHANNELS; i++) {
     // static daisysp::Oscillator *lfo = new daisysp::Oscillator;
     daisysp::Oscillator *lfo = new daisysp::Oscillator;
     oscillators.push_back(*lfo);
-    // Serial.printf("Pointer lives at %p.\n", (void *)lfo);
     lfo->Init(SAMPLERATE);
     Channel channel;
     channel.index = i;
@@ -61,7 +56,6 @@ void initializeChannels(void) {
     channel.lfoWave = i % 5 + 1;
     channel.lfoAmpOffset = 0;
     channel.channelDestinationIndex = i;
-    // channel.channelDestination = &channel;
     channel.lfo = lfo;
     *channels[i] = channel;
 
