@@ -28,11 +28,11 @@ int curGraphIndex = 0;
 bool graphHUD = false;
 
 uint32_t screenStepTime = 6; // ~15fps
-uint32_t channelCalcStepTime = 25;
+uint32_t channelCalcStepTime = 36;
 // uint32_t midiSendStepTime = 13; 
 uint32_t metroStepTime = 11; //
-// uint32_t lfoStepTime = uint32_t(1000000.0f / SAMPLERATE);
-uint32_t lfoStepTime = uint32_t(100000.0f / SAMPLERATE);
+uint32_t lfoStepTime = uint32_t(1000000.0f / SAMPLERATE);
+// uint32_t lfoStepTime = uint32_t(100000.0f / SAMPLERATE);
 
 void setup() {
   Serial.begin(38400);
@@ -214,10 +214,9 @@ void loop() {
 
   // lfo cycle - do this at Samplerate -- 1 kHz = 1000 µs
   if (ellapsedLfoMicros > lfoStepTime) {
-    Serial.println("ellapsedLfoMicros: " + String(ellapsedLfoMicros));
+    // Serial.println("ellapsedLfoMicros: " + String(ellapsedLfoMicros));
     processLfos();
-    // ellapsedLfoMicros = ellapsedLfoMicros - lfoStepTime;
-    ellapsedLfoMicros = 0;
+    ellapsedLfoMicros = ellapsedLfoMicros - lfoStepTime;
   }
 
   if (ellaspedChannelCalcMillis > channelCalcStepTime) {
