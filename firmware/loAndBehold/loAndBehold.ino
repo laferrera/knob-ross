@@ -110,6 +110,8 @@ void loop() {
     }
   }
 
+
+  // control encoder changes
   long newControlChannelValue = controlChannel.read();
   int encDelta = abs(newControlChannelValue - controlChannelValue);
   if ((newControlChannelValue != controlChannelValue) && (encDelta > encoderSens)) {
@@ -143,6 +145,8 @@ void loop() {
     controlChannelValue = newControlChannelValue;
   }
 
+
+  // all the other encoder changes
   for (int i = 0; i < NUM_OF_CHANNELS; i++) {
     long newChannelValue = encoders[i]->read();
     if (newChannelValue != channels[i]->encoderValue) {

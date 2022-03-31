@@ -901,7 +901,7 @@ void GEM_adafruit_gfx::dispatchKeyPress() {
           if (_editValueType == GEM_VAL_SELECT) {
             prevEditValueSelect();
           } else if (_editValueType == GEM_VAL_FLOAT) {
-            prevEditValueFloat(0.1f);
+            prevEditValueFloat(0.01f);
           } else {
             nextEditValueDigit();
           }
